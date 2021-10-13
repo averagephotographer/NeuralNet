@@ -73,7 +73,6 @@ public class Net {
         // if arrays are addable, add them
         // otherwise return error message and exit
         if (areArraysAddable(a1, a2)) {
-
             // adds the arrays together
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
@@ -82,13 +81,18 @@ public class Net {
             }
             return arraySum;
         } else {
+            System.out.println("Cannot add arrays");
+            System.exit(0);
             return arraySum;
         }
     }
 
+    // scalar multiplication of elements in two arrays
     static int[][] multiplyScalar(int[][] a1, int[][] a2) {
+        // initialize output array
         int[][] mulOutput = new int[a1.length][a1[0].length];
 
+        // math
         if (areArraysAddable(a1, a2)) {
             for (int i = 0; i < a1.length; i++) {
                 for (int j = 0; j < a1[0].length; j++) {
@@ -97,43 +101,31 @@ public class Net {
             }
             return mulOutput;
         } else {
+            System.out.println("arrays can't be multiplied scalar-wise");
+            System.exit(0);
             return mulOutput;
         }
     }
 
-    static int[][] multiplyNormal(int[][] a1, int[][] a2) {
-        int[][] mulOutput = new int[a1.length][a2[0].length];
-        for (int i = 0; i < a1[0].length; i++) {
-            int mySum = 0;
-            for (int j = 0; j < a2.length; j++) {
-                mySum = a1[i][j] * a2[i][j];
-                mulOutput[i][j] += mySum;
-            }
-        }
-        return mulOutput;
-    }
-
+    // https://www.varsitytutors.com/hotmath/hotmath_help/topics/matrix-multiplication
     // dot product two arrays
     static int[][] dotProduct(int[][] a1, int[][] a2) {
         int[][] product = new int[a1.length][a2[0].length];
-        printArray(product);
-        // if (areArraysAddable(transpose(a1), a2)) {
-        // return multiplyScalar(transpose(a1), a2);
-        // } else {
-        // System.out.println("dot product arrays aren't compatible");
-        // System.exit(0);
-        // return new int[1][1];
-        // }
 
+        // checks if rows of first matrix and columns of second match
+        if (a1[0].length != a2.length) {
+            System.out.println("cannot dot matrices");
+            printSize(a1, "array1");
+            printSize(a2, "array2");
+            System.exit(0);
+        }
+
+        // math for dot product
         for (int i = 0; i < a1.length; i++) {
             for (int j = 0; j < a2.length; j++) {
                 for (int k = 0; k < a2[0].length; k++) {
-                    System.out.println("i: " + i);
-                    System.out.println("j: " + j);
-                    System.out.println("k: " + k);
                     product[i][k] += a1[i][j] * a2[j][k];
                 }
-
             }
         }
         return product;
@@ -151,44 +143,22 @@ public class Net {
         // }
         // csv_scanner.close();
 
-        // do math
-        // int firstValue = 3;
-        // System.out.print(testMath(firstValue));
-
-        // do array
+        // test arrays
         int[][] myNums = { { 10, 20, 30, 40 }, { 100, 200, 300, 400 }, { 1000, 2000, 3000, 4000 } };
         int[][] myNums2 = { { 10, 20, 30, 78 }, { 100, 14, 200, 300 }, { 40, 12, 12, 41 } };
         int[][] myNums3 = { { 10, 20, 30, 41 }, { 7, 12, 15, 57 }, { 90, 14, 894, 34 } };
         int[][] tallArray = { { 1, 2, 3, 4, 5, 6, 7, 8, 9 } };
-        int[][] simple1 = { { 1, 2, 3 }, { 3, 2, 5 } };
+        int[][] simple1 = { { 1, 2, 3 } };
         int[][] simple2 = { { 2, 3, 4 }, { 3, 3, 2 } };
         int[][] simple3 = { { 1, 2 }, { 3, 6 }, { 2, 4 } };
-        // adding arrays
-        int[][] myFinal = addArrays(myNums2, myNums3);
 
-        // prints output
-        // printArray(myFinal);
-        // System.out.println();
-        // printArray(transpose(myFinal));
-
-        // System.out.println();
-        // printArray(tallArray);
-        // System.out.println();
-        // printArray(transpose(tallArray));
-
-        printArray(simple2);
+        printArray(transpose(simple1));
         System.out.println();
         printArray(simple3);
         System.out.println();
-        // printArray(multiplyArraysScalar(simple1, simple2));
 
         System.out.println("\ndot prod: ");
-        printArray(dotProduct(simple2, simple3));
-
-        // actual dot product
-        System.out.println("\nactual dot prod: ");
-        int[][] actualDot = { { 19, 38 }, { 16, 32 } };
-        printArray(actualDot);
+        printArray(dotProduct(transpose(simple1), simple3));
 
     }
 }
