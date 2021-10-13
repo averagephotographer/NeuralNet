@@ -5,14 +5,14 @@ import javax.print.attribute.standard.MultipleDocumentHandling;
 public class Net {
 
     // prints the height x width of an array
-    static void printSize(int[][] arr, String name) {
+    static void printSize(double[][] arr, String name) {
         System.out.println("h x w: " + name);
         System.out.println(arr.length + " x " + arr[0].length);
         System.out.println();
     }
 
     // prints an array
-    static void printArray(int[][] myArray) {
+    static void printArray(double[][] myArray) {
 
         for (int i = 0; i < myArray.length; i++) {
             for (int j = 0; j < myArray[0].length; j++) {
@@ -24,9 +24,9 @@ public class Net {
     }
 
     // transposes a single array
-    static int[][] transpose(int[][] a1) {
+    static double[][] transpose(double[][] a1) {
 
-        int[][] newArray = new int[a1[0].length][a1.length];
+        double[][] newArray = new double[a1[0].length][a1.length];
 
         for (int i = 0; i < a1[0].length; i++) {
             for (int j = 0; j < a1.length; j++) {
@@ -38,7 +38,7 @@ public class Net {
 
     // checks to see if two arrays are addable
     // assumes arrays are rectangular
-    static Boolean areArraysAddable(int[][] array1, int[][] array2) {
+    static Boolean areArraysAddable(double[][] array1, double[][] array2) {
         // gets array height
         int height1 = array1.length;
         int height2 = array2.length;
@@ -57,18 +57,17 @@ public class Net {
             // printSize(array1, "a1");
             // printSize(array2, "a2");
             return false;
-
         }
     }
 
     // array addition, assumes arrays are are perfect rectangles
-    static int[][] addArrays(int[][] a1, int[][] a2) {
+    static double[][] addArrays(double[][] a1, double[][] a2) {
         // get height and width of arrays
         int height = a1.length;
         int width = a1[0].length;
 
         // init output array
-        int[][] arraySum = new int[height][width];
+        double[][] arraySum = new double[height][width];
 
         // if arrays are addable, add them
         // otherwise return error message and exit
@@ -79,38 +78,36 @@ public class Net {
                     arraySum[i][j] = a1[i][j] + a2[i][j];
                 }
             }
-            return arraySum;
         } else {
             System.out.println("Cannot add arrays");
             System.exit(0);
-            return arraySum;
         }
+        return arraySum;
     }
 
     // scalar multiplication of elements in two arrays
-    static int[][] multiplyScalar(int[][] a1, int[][] a2) {
+    static double[][] multiplyScalar(double[][] a1, double[][] a2) {
         // initialize output array
-        int[][] mulOutput = new int[a1.length][a1[0].length];
+        double[][] mulOutput = new double[a1.length][a1[0].length];
 
-        // math
+        // multiplication
         if (areArraysAddable(a1, a2)) {
             for (int i = 0; i < a1.length; i++) {
                 for (int j = 0; j < a1[0].length; j++) {
                     mulOutput[i][j] = a1[i][j] * a2[i][j];
                 }
             }
-            return mulOutput;
         } else {
             System.out.println("arrays can't be multiplied scalar-wise");
             System.exit(0);
-            return mulOutput;
         }
+        return mulOutput;
     }
 
     // https://www.varsitytutors.com/hotmath/hotmath_help/topics/matrix-multiplication
     // dot product two arrays
-    static int[][] dotProduct(int[][] a1, int[][] a2) {
-        int[][] product = new int[a1.length][a2[0].length];
+    static double[][] dotProduct(double[][] a1, double[][] a2) {
+        double[][] product = new double[a1.length][a2[0].length];
 
         // checks if rows of first matrix and columns of second match
         if (a1[0].length != a2.length) {
@@ -131,6 +128,25 @@ public class Net {
         return product;
     }
 
+    static double[][] sigmoid(double[][] input, double[][] weight, double[][] bias) {
+        double[][] sigmoidOut = new double[weight.length][bias[0].length];
+        double[][] prod = dotProduct(weight, input);
+        double[][] zValue = addArrays(prod, bias);
+
+        printSize(zValue, "zValue");
+        printArray(zValue);
+        System.out.println();
+
+        for (int i = 0; i < weight.length; i++) {
+            for (int j = 0; j < bias[0].length; j++) {
+                sigmoidOut[i][j] = (1 / (1 + Math.pow(Math.E, -(zValue[i][j]))));
+            }
+        }
+
+        return sigmoidOut;
+
+    }
+
     public static void main(String[] csv_file_name) throws FileNotFoundException {
 
         // https://www.javatpoint.com/how-to-read-csv-file-in-java
@@ -143,22 +159,49 @@ public class Net {
         // }
         // csv_scanner.close();
 
-        // test arrays
-        int[][] myNums = { { 10, 20, 30, 40 }, { 100, 200, 300, 400 }, { 1000, 2000, 3000, 4000 } };
-        int[][] myNums2 = { { 10, 20, 30, 78 }, { 100, 14, 200, 300 }, { 40, 12, 12, 41 } };
-        int[][] myNums3 = { { 10, 20, 30, 41 }, { 7, 12, 15, 57 }, { 90, 14, 894, 34 } };
-        int[][] tallArray = { { 1, 2, 3, 4, 5, 6, 7, 8, 9 } };
-        int[][] simple1 = { { 1, 2, 3 } };
-        int[][] simple2 = { { 2, 3, 4 }, { 3, 3, 2 } };
-        int[][] simple3 = { { 1, 2 }, { 3, 6 }, { 2, 4 } };
+        // mini-batch #1
+        // training case 1
+        double[][] xTrain1 = { { 0 }, { 1 }, { 0 }, { 1 } };
+        double[][] yTrain1 = { { 0 }, { 1 } };
 
-        printArray(transpose(simple1));
-        System.out.println();
-        printArray(simple3);
+        // training case 2
+        double[][] xTrain2 = { { 1 }, { 0 }, { 1 }, { 0 } };
+
+        double[][] yTrain2 = { { 1 }, { 0 } };
+
+        // mini-batch #2
+        // training case 1
+        double[][] x2Train1 = { { 0 }, { 1 }, { 0 }, { 1 } };
+
+        double[][] y2Train1 = { { 0 }, { 1 } };
+
+        // training case 2
+        double[][] x2Train2 = { { 1 }, { 0 }, { 1 }, { 0 } };
+        double[][] y2Train2 = { { 1 }, { 0 } };
+
+        double[][] weight1 = { { -0.21, 0.72, -0.25, 1 }, { -0.94, -0.41, -0.47, 0.63 }, { 0.15, 0.55, -0.49, -0.75 } };
+
+        double[][] bias1 = { { 0.1 }, { -0.36 }, { -0.31 } };
+
+        double[][] weight2 = { { 0.76, 0.48, -0.73 }, { 0.34, 0.89, -0.23 } };
+
+        double[][] bias2 = { { 0.16 }, { -0.46 } };
+
+        printSize(xTrain1, "xTrain1");
+        printArray(xTrain1);
         System.out.println();
 
-        System.out.println("\ndot prod: ");
-        printArray(dotProduct(transpose(simple1), simple3));
+        printSize(weight1, "weight1");
+        printArray(weight1);
+        System.out.println();
+
+        printSize(bias1, "bias1");
+        printArray(bias1);
+        System.out.println();
+
+        double[][] myOut = sigmoid(xTrain1, weight1, bias1);
+        printSize(myOut, "myOut");
+        printArray(myOut);
 
     }
 }
