@@ -3,33 +3,79 @@ import java.util.Scanner;
 
 public class Net {
 
+    static Boolean areArraysAddable(Integer[][] array1, Integer[][] array2) {
+        // gets array height
+        Integer height1 = array1.length;
+        Integer height2 = array2.length;
+
+        // gets array width
+        // note: this assumes the row length is consistent
+        Integer width1 = array1[0].length;
+        Integer width2 = array2[0].length;
+
+        // checks to see if the arrays are the same size
+        if ((height1 == height2) && (width1 == width2)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    static Integer[][] transpose(Integer[][] a1) {
+        Integer[][] newArray = new Integer[a1[0].length][a1.length];
+        for (int i = 0; i < a1[0].length; i++) {
+            for (int j = 0; j < a1.length; j++) {
+                newArray[i][j] = a1[j][i];
+            }
+        }
+        return newArray;
+    }
+
+    static Integer[][] dotProduct(Integer[][] a1, Integer[] a2) {
+        Integer[][] temp = { { 0, 0 } };
+        return temp;
+    }
+
     static Integer testMath(Integer myInt, Integer myInt2) {
         Integer myValue = 2;
         return myValue + myInt;
     }
 
-    static Integer[][] addArrays(Integer[][] a1, Integer[][] a2) {
-        // gets array height
-        Integer column1 = a1.length;
-        Integer column2 = a2.length;
+    // prints arrays
+    static void printArray(Integer[][] myArray) {
+        for (int i = 0; i < myArray.length; i++) {
+            for (int j = 0; j < myArray[0].length; j++) {
+                System.out.print(myArray[i][j] + "\t");
+            }
+            System.out.println();
+        }
+    }
 
-        // gets array width
-        // note: this assumes the row length is consistent
-        Integer row1 = a1[0].length;
-        Integer row2 = a2[0].length;
+    // array addition, assumes arrays are are perfect rectangles
+    static Integer[][] addArrays(Integer[][] a1, Integer[][] a2) {
+        // get height and width of arrays
+        Integer height = a1.length;
+        Integer width = a1[0].length;
 
         // init output array
-        Integer[][] arraySum = new Integer[column1][row1];
-        // checks to see if the arrays are the same size
-        if ((column1 == column2) && (row1 == row2)) {
-            for (int i = 0; i < column1; i++) {
-                for (int j = 0; j < row1; j++) {
-                    System.out.println(i + " " + j);
+        Integer[][] arraySum = new Integer[height][width];
+
+        // height and width info
+        System.out.println("h x w");
+        System.out.println(height + " x " + width);
+        System.out.println();
+
+        // if arrays are addable, add them
+        // otherwise return error message and exit
+        if (areArraysAddable(a1, a2)) {
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
                     arraySum[i][j] = a1[i][j] + a2[i][j];
                 }
             }
         } else {
             System.out.println("matrices are not the same");
+            System.exit(0);
         }
         return arraySum;
     }
@@ -52,27 +98,20 @@ public class Net {
 
         // do array
         Integer[][] myNums = { { 10, 20, 30, 40 }, { 100, 200, 300, 400 }, { 1000, 2000, 3000, 4000 } };
-        Integer[][] myNums2 = { { 30 }, { 100, 200, 300 } };
-        Integer[][] myNums3 = { { 30 }, { 100 } };
+        Integer[][] myNums2 = { { 10, 20, 30, 78 }, { 100, 14, 200, 300 }, { 40, 12, 12, 41 } };
+        Integer[][] myNums3 = { { 10, 20, 30, 41 }, { 7, 12, 15, 57 }, { 90, 14, 894, 34 } };
+        Integer[][] tallArray = { { 1, 2, 3, 4, 5, 6, 7, 8, 9 } };
+        // adding arrays
+        Integer[][] myFinal = addArrays(myNums2, myNums3);
 
-        System.out.print(myNums[1][2] + " " + (myNums.length));
+        // prints output
+        printArray(myFinal);
         System.out.println();
-        System.out.print(myNums2[1][2] + " " + (myNums2.length));
+        printArray(tallArray);
         System.out.println();
-        System.out.print(myNums3[0][0] + " " + (myNums3.length));
-
-        // do array math
+        printArray(transpose(myFinal));
         System.out.println();
-        addArrays(myNums, myNums2);
-        Integer[][] myFinal = addArrays(myNums, myNums);
-
-        System.out.println(myFinal);
-        for (int i = 0; i < myFinal.length; i++) {
-            for (int j = 0; j < myFinal[0].length; j++) {
-                System.out.println(myFinal[i][j]);
-            }
-            System.out.println();
-        }
+        printArray(transpose(tallArray));
 
     }
 }
