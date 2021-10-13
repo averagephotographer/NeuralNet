@@ -1,28 +1,33 @@
 import java.io.*;
 import java.util.Scanner;
+import javax.print.attribute.standard.MultipleDocumentHandling;
 
 public class Net {
 
-    static Boolean areArraysAddable(Integer[][] array1, Integer[][] array2) {
-        // gets array height
-        Integer height1 = array1.length;
-        Integer height2 = array2.length;
+    // prints the height x width of an array
+    static void printSize(int[][] arr, String name) {
+        System.out.println("h x w: " + name);
+        System.out.println(arr.length + " x " + arr[0].length);
+        System.out.println();
+    }
 
-        // gets array width
-        // note: this assumes the row length is consistent
-        Integer width1 = array1[0].length;
-        Integer width2 = array2[0].length;
+    // prints an array
+    static void printArray(int[][] myArray) {
 
-        // checks to see if the arrays are the same size
-        if ((height1 == height2) && (width1 == width2)) {
-            return true;
-        } else {
-            return false;
+        for (int i = 0; i < myArray.length; i++) {
+            for (int j = 0; j < myArray[0].length; j++) {
+                System.out.print(myArray[i][j] + "\t");
+            }
+
+            System.out.println();
         }
     }
 
-    static Integer[][] transpose(Integer[][] a1) {
-        Integer[][] newArray = new Integer[a1[0].length][a1.length];
+    // transposes a single array
+    static int[][] transpose(int[][] a1) {
+
+        int[][] newArray = new int[a1[0].length][a1.length];
+
         for (int i = 0; i < a1[0].length; i++) {
             for (int j = 0; j < a1.length; j++) {
                 newArray[i][j] = a1[j][i];
@@ -31,53 +36,107 @@ public class Net {
         return newArray;
     }
 
-    static Integer[][] dotProduct(Integer[][] a1, Integer[] a2) {
-        Integer[][] temp = { { 0, 0 } };
-        return temp;
-    }
+    // checks to see if two arrays are addable
+    // assumes arrays are rectangular
+    static Boolean areArraysAddable(int[][] array1, int[][] array2) {
+        // gets array height
+        int height1 = array1.length;
+        int height2 = array2.length;
 
-    static Integer testMath(Integer myInt, Integer myInt2) {
-        Integer myValue = 2;
-        return myValue + myInt;
-    }
+        // gets array width
+        // note: this assumes the row length is consistent
+        int width1 = array1[0].length;
+        int width2 = array2[0].length;
 
-    // prints arrays
-    static void printArray(Integer[][] myArray) {
-        for (int i = 0; i < myArray.length; i++) {
-            for (int j = 0; j < myArray[0].length; j++) {
-                System.out.print(myArray[i][j] + "\t");
-            }
-            System.out.println();
+        // checks to see if the arrays are the same size
+        if ((height1 == height2) && (width1 == width2)) {
+            return true;
+        } else {
+            // error if the arrays aren't addable
+            // System.out.println("arrays aren't addable");
+            // printSize(array1, "a1");
+            // printSize(array2, "a2");
+            return false;
+
         }
     }
 
     // array addition, assumes arrays are are perfect rectangles
-    static Integer[][] addArrays(Integer[][] a1, Integer[][] a2) {
+    static int[][] addArrays(int[][] a1, int[][] a2) {
         // get height and width of arrays
-        Integer height = a1.length;
-        Integer width = a1[0].length;
+        int height = a1.length;
+        int width = a1[0].length;
 
         // init output array
-        Integer[][] arraySum = new Integer[height][width];
-
-        // height and width info
-        System.out.println("h x w");
-        System.out.println(height + " x " + width);
-        System.out.println();
+        int[][] arraySum = new int[height][width];
 
         // if arrays are addable, add them
         // otherwise return error message and exit
         if (areArraysAddable(a1, a2)) {
+
+            // adds the arrays together
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
                     arraySum[i][j] = a1[i][j] + a2[i][j];
                 }
             }
+            return arraySum;
         } else {
-            System.out.println("matrices are not the same");
-            System.exit(0);
+            return arraySum;
         }
-        return arraySum;
+    }
+
+    static int[][] multiplyScalar(int[][] a1, int[][] a2) {
+        int[][] mulOutput = new int[a1.length][a1[0].length];
+
+        if (areArraysAddable(a1, a2)) {
+            for (int i = 0; i < a1.length; i++) {
+                for (int j = 0; j < a1[0].length; j++) {
+                    mulOutput[i][j] = a1[i][j] * a2[i][j];
+                }
+            }
+            return mulOutput;
+        } else {
+            return mulOutput;
+        }
+    }
+
+    static int[][] multiplyNormal(int[][] a1, int[][] a2) {
+        int[][] mulOutput = new int[a1.length][a2[0].length];
+        for (int i = 0; i < a1[0].length; i++) {
+            int mySum = 0;
+            for (int j = 0; j < a2.length; j++) {
+                mySum = a1[i][j] * a2[i][j];
+                mulOutput[i][j] += mySum;
+            }
+        }
+        return mulOutput;
+    }
+
+    // dot product two arrays
+    static int[][] dotProduct(int[][] a1, int[][] a2) {
+        int[][] product = new int[a1.length][a2[0].length];
+        printArray(product);
+        // if (areArraysAddable(transpose(a1), a2)) {
+        // return multiplyScalar(transpose(a1), a2);
+        // } else {
+        // System.out.println("dot product arrays aren't compatible");
+        // System.exit(0);
+        // return new int[1][1];
+        // }
+
+        for (int i = 0; i < a1.length; i++) {
+            for (int j = 0; j < a2.length; j++) {
+                for (int k = 0; k < a2[0].length; k++) {
+                    System.out.println("i: " + i);
+                    System.out.println("j: " + j);
+                    System.out.println("k: " + k);
+                    product[i][k] += a1[i][j] * a2[j][k];
+                }
+
+            }
+        }
+        return product;
     }
 
     public static void main(String[] csv_file_name) throws FileNotFoundException {
@@ -93,25 +152,43 @@ public class Net {
         // csv_scanner.close();
 
         // do math
-        // Integer firstValue = 3;
+        // int firstValue = 3;
         // System.out.print(testMath(firstValue));
 
         // do array
-        Integer[][] myNums = { { 10, 20, 30, 40 }, { 100, 200, 300, 400 }, { 1000, 2000, 3000, 4000 } };
-        Integer[][] myNums2 = { { 10, 20, 30, 78 }, { 100, 14, 200, 300 }, { 40, 12, 12, 41 } };
-        Integer[][] myNums3 = { { 10, 20, 30, 41 }, { 7, 12, 15, 57 }, { 90, 14, 894, 34 } };
-        Integer[][] tallArray = { { 1, 2, 3, 4, 5, 6, 7, 8, 9 } };
+        int[][] myNums = { { 10, 20, 30, 40 }, { 100, 200, 300, 400 }, { 1000, 2000, 3000, 4000 } };
+        int[][] myNums2 = { { 10, 20, 30, 78 }, { 100, 14, 200, 300 }, { 40, 12, 12, 41 } };
+        int[][] myNums3 = { { 10, 20, 30, 41 }, { 7, 12, 15, 57 }, { 90, 14, 894, 34 } };
+        int[][] tallArray = { { 1, 2, 3, 4, 5, 6, 7, 8, 9 } };
+        int[][] simple1 = { { 1, 2, 3 }, { 3, 2, 5 } };
+        int[][] simple2 = { { 2, 3, 4 }, { 3, 3, 2 } };
+        int[][] simple3 = { { 1, 2 }, { 3, 6 }, { 2, 4 } };
         // adding arrays
-        Integer[][] myFinal = addArrays(myNums2, myNums3);
+        int[][] myFinal = addArrays(myNums2, myNums3);
 
         // prints output
-        printArray(myFinal);
+        // printArray(myFinal);
+        // System.out.println();
+        // printArray(transpose(myFinal));
+
+        // System.out.println();
+        // printArray(tallArray);
+        // System.out.println();
+        // printArray(transpose(tallArray));
+
+        printArray(simple2);
         System.out.println();
-        printArray(tallArray);
+        printArray(simple3);
         System.out.println();
-        printArray(transpose(myFinal));
-        System.out.println();
-        printArray(transpose(tallArray));
+        // printArray(multiplyArraysScalar(simple1, simple2));
+
+        System.out.println("\ndot prod: ");
+        printArray(dotProduct(simple2, simple3));
+
+        // actual dot product
+        System.out.println("\nactual dot prod: ");
+        int[][] actualDot = { { 19, 38 }, { 16, 32 } };
+        printArray(actualDot);
 
     }
 }
