@@ -1,8 +1,17 @@
 import java.io.*;
 import java.util.Scanner;
-import javax.print.attribute.standard.MultipleDocumentHandling;
 
 public class Net {
+
+    static double[][] onesArray(int height, int width) {
+        double[][] onesArray = new double[height][width];
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                onesArray[i][j] = 1;
+            }
+        }
+        return onesArray;
+    }
 
     // prints the height x width of an array
     static void printSize(double[][] arr, String name) {
@@ -85,6 +94,31 @@ public class Net {
         return arraySum;
     }
 
+    // subtract arrays
+    static double[][] subtractArrays(double[][] a1, double[][] a2) {
+        // get height and width of arrays
+        int height = a1.length;
+        int width = a1[0].length;
+
+        // init output array
+        double[][] arrayDiff = new double[height][width];
+
+        // if arrays are addable, add them
+        // otherwise return error message and exit
+        if (areArraysAddable(a1, a2)) {
+            // adds the arrays together
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    arrayDiff[i][j] = a1[i][j] - a2[i][j];
+                }
+            }
+        } else {
+            System.out.println("Cannot add arrays");
+            System.exit(0);
+        }
+        return arrayDiff;
+    }
+
     // scalar multiplication of elements in two arrays
     static double[][] multiplyScalar(double[][] a1, double[][] a2) {
         // initialize output array
@@ -147,6 +181,32 @@ public class Net {
 
     }
 
+    // backprop
+    // should I use dot prod to make this simpler?
+    static double[][] backprop(double[][] output, double[][] trainData) {
+        double[][] ones = onesArray(trainData.length, trainData[0].length);
+        return multiplyScalar(multiplyScalar(subtractArrays(output, trainData), output), subtractArrays(ones, output));
+    }
+
+    // GradientOfWeights
+    static double[][] gradientOfWeights(double[][] gradientBiases, double[][] output) {
+        return dotProduct(gradientBiases, output);
+    }
+
+    /* BACKPROP AGLOS */
+
+    // Bias gradient for final output layer
+
+    // sigLj = (aLj-yj)-yj) * aLj * (1-aLj)
+
+    // error in lth layer in terms of l+1th layer
+
+    // rate of change of the cost wrt any bias
+    // BiasGradient ^lj=sig^lj
+
+    // rate of change of the cost wrt any weight in the network
+    // WeightGradient^l(jk)=a^(l-1)k*sig^lj
+
     public static void main(String[] csv_file_name) throws FileNotFoundException {
 
         // https://www.javatpoint.com/how-to-read-csv-file-in-java
@@ -202,6 +262,25 @@ public class Net {
         double[][] myOut = sigmoid(xTrain1, weight1, bias1);
         printSize(myOut, "myOut");
         printArray(myOut);
+        System.out.println();
 
+        double[][] myOut2 = sigmoid(myOut, weight2, bias2);
+        printSize(myOut2, "myOut2");
+        printArray(myOut2);
+        System.out.println();
+
+        // backward pass through layer 2 (the 'output' or 3rd layer) of the network
+        double[][] dLayer2 = backprop(myOut2, yTrain1);
+        printSize(dLayer2, "dLayer2");
+        printArray(dLayer2);
+        System.out.println();
+
+        double[][] gradWeight = gradientOfWeights(dLayer2, transpose(myOut));
+        printSize(gradWeight, "gradWeight");
+        printArray(gradWeight);
+        System.out.println();
+
+        // double[][] dLayer1 = backprop(dLayer2, yTrain2);
     }
+
 }
