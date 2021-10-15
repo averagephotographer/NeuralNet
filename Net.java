@@ -178,13 +178,12 @@ public class Net {
         }
 
         return sigmoidOut;
-
     }
 
-    // backprop
-    // should I use dot prod to make this simpler?
-    static double[][] backprop(double[][] output, double[][] trainData) {
+    // input the
+    static double[][] backpropLast(double[][] output, double[][] trainData) {
         double[][] ones = onesArray(trainData.length, trainData[0].length);
+        // should I use dot prod to make this simpler?
         return multiplyScalar(multiplyScalar(subtractArrays(output, trainData), output), subtractArrays(ones, output));
     }
 
@@ -193,6 +192,19 @@ public class Net {
         return dotProduct(gradientBiases, output);
     }
 
+    static double[][] backpropFirst(double[][] dLayer, int layer, double[][] weights, double[][] prevMyOut) {
+        double[][] biasGradient = new double[prevMyOut.length][prevMyOut[0].length];
+        for (int k = 0; k < prevMyOut[0].length; k++) {
+            for (int j = 0; j < weights[0].length; j++) {
+                // could I transpose dLayer to make it simpler and do the dot product
+                // this feels kinda sketch
+                biasGradient[j][k] += (weights[k][j] * dLayer[k][0] + weights[k + 1][j] * dLayer[k + 1][0])
+                        * (prevMyOut[j][0] * (1 - prevMyOut[j][0]));
+
+            }
+        }
+        return biasGradient;
+    }
     /* BACKPROP AGLOS */
 
     // Bias gradient for final output layer
@@ -270,17 +282,21 @@ public class Net {
         System.out.println();
 
         // backward pass through layer 2 (the 'output' or 3rd layer) of the network
-        double[][] dLayer2 = backprop(myOut2, yTrain1);
+        double[][] dLayer2 = backpropLast(myOut2, yTrain1);
         printSize(dLayer2, "dLayer2");
         printArray(dLayer2);
         System.out.println();
 
-        double[][] gradWeight = gradientOfWeights(dLayer2, transpose(myOut));
-        printSize(gradWeight, "gradWeight");
-        printArray(gradWeight);
+        double[][] gradWeight2 = gradientOfWeights(dLayer2, transpose(myOut));
+        printSize(gradWeight2, "gradWeight");
+        printArray(gradWeight2);
         System.out.println();
 
-        // double[][] dLayer1 = backprop(dLayer2, yTrain2);
+        int currLayer = 2;
+        double[][] dLayer1 = backpropFirst(dLayer2, currLayer, weight2, myOut);
+        printSize(dLayer1, "dLayer1");
+        printArray(dLayer1);
+        System.out.println();
     }
 
 }
