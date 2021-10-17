@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.Scanner;
+import mB.MiniBatch;
+import mB.Array;
 
 public class Net {
 
@@ -11,25 +13,6 @@ public class Net {
             }
         }
         return onesArray;
-    }
-
-    // prints the height x width of an array
-    static void printSize(double[][] arr, String name) {
-        System.out.println("h x w: " + name);
-        System.out.println(arr.length + " x " + arr[0].length);
-        System.out.println();
-    }
-
-    // prints an array
-    static void printArray(double[][] myArray) {
-
-        for (int i = 0; i < myArray.length; i++) {
-            for (int j = 0; j < myArray[0].length; j++) {
-                System.out.print(myArray[i][j] + "\t");
-            }
-
-            System.out.println();
-        }
     }
 
     // transposes a single array
@@ -146,8 +129,8 @@ public class Net {
         // checks if rows of first matrix and columns of second match
         if (a1[0].length != a2.length) {
             System.out.println("cannot dot matrices");
-            printSize(a1, "array1");
-            printSize(a2, "array2");
+            Array.print(a1, "array1");
+            Array.print(a2, "array2");
             System.exit(0);
         }
 
@@ -167,8 +150,7 @@ public class Net {
         double[][] prod = dotProduct(weight, input);
         double[][] zValue = addArrays(prod, bias);
 
-        printSize(zValue, "zValue");
-        printArray(zValue);
+        Array.print(zValue, "zValue");
         System.out.println();
 
         for (int i = 0; i < weight.length; i++) {
@@ -180,7 +162,7 @@ public class Net {
         return sigmoidOut;
     }
 
-    // input the
+    // final output layer math
     static double[][] backpropLast(double[][] output, double[][] trainData) {
         double[][] ones = onesArray(trainData.length, trainData[0].length);
         // should I use dot prod to make this simpler?
@@ -188,10 +170,12 @@ public class Net {
     }
 
     // GradientOfWeights
+    // TODO: move transpose from main to here
     static double[][] gradientOfWeights(double[][] gradientBiases, double[][] output) {
-        return dotProduct(gradientBiases, output);
+        return dotProduct(gradientBiases, transpose(output));
     }
 
+    // everything that's not last
     static double[][] backpropFirst(double[][] dLayer, int layer, double[][] weights, double[][] prevMyOut) {
         double[][] biasGradient = new double[prevMyOut.length][prevMyOut[0].length];
         for (int k = 0; k < prevMyOut[0].length; k++) {
@@ -200,36 +184,31 @@ public class Net {
                 // this feels kinda sketch
                 biasGradient[j][k] += (weights[k][j] * dLayer[k][0] + weights[k + 1][j] * dLayer[k + 1][0])
                         * (prevMyOut[j][0] * (1 - prevMyOut[j][0]));
-
             }
         }
         return biasGradient;
     }
-    /* BACKPROP AGLOS */
 
-    // Bias gradient for final output layer
-
-    // sigLj = (aLj-yj)-yj) * aLj * (1-aLj)
-
-    // error in lth layer in terms of l+1th layer
-
-    // rate of change of the cost wrt any bias
-    // BiasGradient ^lj=sig^lj
-
-    // rate of change of the cost wrt any weight in the network
-    // WeightGradient^l(jk)=a^(l-1)k*sig^lj
-
-    public static void main(String[] csv_file_name) throws FileNotFoundException {
-
+    static Scanner csvReader(String fileName) throws FileNotFoundException {
         // https://www.javatpoint.com/how-to-read-csv-file-in-java
         // pulls csv into java, prints it
+        // filename: mnist_test.csv
 
-        // Scanner csv_scanner = new Scanner(new File("mnist_test.csv"));
-        // csv_scanner.useDelimiter(",");
-        // while (csv_scanner.hasNext()) {
-        // System.out.print(csv_scanner.next());
-        // }
-        // csv_scanner.close();
+        Scanner csvData = new Scanner(new File(fileName));
+        csvData.useDelimiter(",");
+        while (csvData.hasNext()) {
+            System.out.print(csvData.next());
+        }
+        csvData.close();
+        return csvData;
+    }
+
+    // function to combine a bunch of other functions
+    // inputs training data
+    // returns double[][] with
+    // am I going to make a class system for this lol
+
+    public static void main(String[] csv_file_name) {
 
         // mini-batch #1
         // training case 1
@@ -238,65 +217,54 @@ public class Net {
 
         // training case 2
         double[][] xTrain2 = { { 1 }, { 0 }, { 1 }, { 0 } };
-
         double[][] yTrain2 = { { 1 }, { 0 } };
+
+        /////////////////////////////////////////////////////////
 
         // mini-batch #2
         // training case 1
         double[][] x2Train1 = { { 0 }, { 1 }, { 0 }, { 1 } };
-
         double[][] y2Train1 = { { 0 }, { 1 } };
 
         // training case 2
         double[][] x2Train2 = { { 1 }, { 0 }, { 1 }, { 0 } };
         double[][] y2Train2 = { { 1 }, { 0 } };
 
-        double[][] weight1 = { { -0.21, 0.72, -0.25, 1 }, { -0.94, -0.41, -0.47, 0.63 }, { 0.15, 0.55, -0.49, -0.75 } };
+        /////////////////////////////////////////////////////////
 
+        // for both batches
+        double[][] weight1 = { { -0.21, 0.72, -0.25, 1 }, { -0.94, -0.41, -0.47, 0.63 }, { 0.15, 0.55, -0.49, -0.75 } };
         double[][] bias1 = { { 0.1 }, { -0.36 }, { -0.31 } };
 
         double[][] weight2 = { { 0.76, 0.48, -0.73 }, { 0.34, 0.89, -0.23 } };
-
         double[][] bias2 = { { 0.16 }, { -0.46 } };
 
-        printSize(xTrain1, "xTrain1");
-        printArray(xTrain1);
-        System.out.println();
+        Array.print(xTrain1, "xTrain1");
 
-        printSize(weight1, "weight1");
-        printArray(weight1);
-        System.out.println();
+        Array.print(weight1, "weight1");
 
-        printSize(bias1, "bias1");
-        printArray(bias1);
-        System.out.println();
+        Array.print(bias1, "bias1");
 
         double[][] myOut = sigmoid(xTrain1, weight1, bias1);
-        printSize(myOut, "myOut");
-        printArray(myOut);
-        System.out.println();
+        Array.print(myOut, "myOut");
 
         double[][] myOut2 = sigmoid(myOut, weight2, bias2);
-        printSize(myOut2, "myOut2");
-        printArray(myOut2);
-        System.out.println();
+        Array.print(myOut2, "myOut2");
 
         // backward pass through layer 2 (the 'output' or 3rd layer) of the network
         double[][] dLayer2 = backpropLast(myOut2, yTrain1);
-        printSize(dLayer2, "dLayer2");
-        printArray(dLayer2);
-        System.out.println();
+        Array.print(dLayer2, "dLayer2");
 
-        double[][] gradWeight2 = gradientOfWeights(dLayer2, transpose(myOut));
-        printSize(gradWeight2, "gradWeight");
-        printArray(gradWeight2);
-        System.out.println();
+        double[][] gradWeight2 = gradientOfWeights(dLayer2, myOut);
+        Array.print(gradWeight2, "gradWeight");
 
         int currLayer = 2;
         double[][] dLayer1 = backpropFirst(dLayer2, currLayer, weight2, myOut);
-        printSize(dLayer1, "dLayer1");
-        printArray(dLayer1);
-        System.out.println();
+        Array.print(dLayer1, "dLayer1");
+
+        double[][] gradWeight1 = gradientOfWeights(dLayer1, xTrain1);
+        Array.print(gradWeight1, "gradWeight1");
+
     }
 
 }
