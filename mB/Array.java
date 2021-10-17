@@ -2,7 +2,7 @@ package mB;
 
 public class Array {
     private double[][] arr;
-    private String name;
+    // private String name;
 
     public void setArray(double[][] arr) {
         this.arr = arr;

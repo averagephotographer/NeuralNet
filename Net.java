@@ -129,8 +129,6 @@ public class Net {
         // checks if rows of first matrix and columns of second match
         if (a1[0].length != a2.length) {
             System.out.println("cannot dot matrices");
-            Array.print(a1, "array1");
-            Array.print(a2, "array2");
             System.exit(0);
         }
 
@@ -149,9 +147,6 @@ public class Net {
         double[][] sigmoidOut = new double[weight.length][bias[0].length];
         double[][] prod = dotProduct(weight, input);
         double[][] zValue = addArrays(prod, bias);
-
-        Array.print(zValue, "zValue");
-        System.out.println();
 
         for (int i = 0; i < weight.length; i++) {
             for (int j = 0; j < bias[0].length; j++) {
@@ -176,7 +171,7 @@ public class Net {
     }
 
     // everything that's not last
-    static double[][] backpropFirst(double[][] dLayer, int layer, double[][] weights, double[][] prevMyOut) {
+    static double[][] backpropRest(double[][] dLayer, double[][] weights, double[][] prevMyOut) {
         double[][] biasGradient = new double[prevMyOut.length][prevMyOut[0].length];
         for (int k = 0; k < prevMyOut[0].length; k++) {
             for (int j = 0; j < weights[0].length; j++) {
@@ -187,6 +182,34 @@ public class Net {
             }
         }
         return biasGradient;
+    }
+
+    static double[][] revisedBias(double[][] bias, double[][] hiddenInput1, double[][] hiddenInput2, double eta) {
+        double[][] revisedBias = new double[bias.length][bias[0].length];
+        for (int i = 0; i < bias[0].length; i++) {
+            for (int j = 0; j < bias.length; j++) {
+                System.out.println("i, j:\n" + i + ", " + j);
+                System.out.println("bias: " + bias[j][i]);
+                System.out.println("hI1: " + hiddenInput1[j][i]);
+                System.out.println("hI2: " + hiddenInput2[j][i]);
+
+                revisedBias[j][i] = bias[j][i] - (eta / 2) * (hiddenInput1[j][i] + hiddenInput2[j][i]);
+                Array.print(revisedBias, "rbTemp");
+            }
+        }
+        return revisedBias;
+    }
+
+    // c27 - (eta/2) * (w27+ax27)
+    static double[][] revisedWeights(double[][] originalWeights, double[][] gW1, double[][] gW2, double eta) {
+        double[][] revisedWeights = new double[originalWeights.length][originalWeights[0].length];
+        for (int i = 0; i < originalWeights[0].length; i++) {
+            for (int j = 0; j < originalWeights.length; j++) {
+                revisedWeights[j][i] = originalWeights[j][i] - (eta / 2) * (gW1[j][i] + gW2[j][i]);
+
+            }
+        }
+        return revisedWeights;
     }
 
     static Scanner csvReader(String fileName) throws FileNotFoundException {
@@ -239,32 +262,39 @@ public class Net {
         double[][] weight2 = { { 0.76, 0.48, -0.73 }, { 0.34, 0.89, -0.23 } };
         double[][] bias2 = { { 0.16 }, { -0.46 } };
 
-        Array.print(xTrain1, "xTrain1");
-
-        Array.print(weight1, "weight1");
-
-        Array.print(bias1, "bias1");
+        // Training Case 1
 
         double[][] myOut = sigmoid(xTrain1, weight1, bias1);
-        Array.print(myOut, "myOut");
-
         double[][] myOut2 = sigmoid(myOut, weight2, bias2);
-        Array.print(myOut2, "myOut2");
-
         // backward pass through layer 2 (the 'output' or 3rd layer) of the network
         double[][] dLayer2 = backpropLast(myOut2, yTrain1);
-        Array.print(dLayer2, "dLayer2");
-
         double[][] gradWeight2 = gradientOfWeights(dLayer2, myOut);
-        Array.print(gradWeight2, "gradWeight");
-
-        int currLayer = 2;
-        double[][] dLayer1 = backpropFirst(dLayer2, currLayer, weight2, myOut);
-        Array.print(dLayer1, "dLayer1");
-
+        double[][] dLayer1 = backpropRest(dLayer2, weight2, myOut);
         double[][] gradWeight1 = gradientOfWeights(dLayer1, xTrain1);
-        Array.print(gradWeight1, "gradWeight1");
 
+        // Training Case 2
+        // uses the same weights as training case 1
+        double[][] my2Out = sigmoid(xTrain2, weight1, bias1);
+        double[][] my2Out2 = sigmoid(my2Out, weight2, bias2);
+        double[][] d2layer2 = backpropLast(my2Out2, yTrain2);
+        double[][] grad2Weight2 = gradientOfWeights(d2layer2, my2Out);
+        double[][] d2Layer1 = backpropRest(d2layer2, weight2, my2Out);
+        double[][] grad2Weight1 = gradientOfWeights(d2Layer1, xTrain2);
+
+        Array.print(gradWeight1, "gradWeight1"); // case 1
+        Array.print(grad2Weight1, "grad2Weight1"); // case 2
+
+        // revising biases and weights
+        double eta = 10;
+        // layer 1 biases and weights
+        double[][] rB1 = revisedBias(bias1, dLayer1, d2Layer1, eta);
+        double[][] rW1 = revisedWeights(weight1, gradWeight1, grad2Weight1, eta);
+        // layer 2 biases and weights
+        double[][] rB2 = revisedBias(bias2, dLayer2, d2layer2, eta);
+        double[][] rW2 = revisedWeights(weight2, gradWeight2, grad2Weight2, eta);
+
+        Array.print(rW1, "rw1");
+        Array.print(rW2, "rw2");
     }
 
 }

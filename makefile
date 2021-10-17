@@ -5,8 +5,8 @@ JC = javac
 		$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
-		Array.java \
-		MiniBatch.java \
+		mB/Array.java \
+		mB/MiniBatch.java \
 		Net.java
 
 default: classes
