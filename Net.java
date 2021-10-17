@@ -188,13 +188,8 @@ public class Net {
         double[][] revisedBias = new double[bias.length][bias[0].length];
         for (int i = 0; i < bias[0].length; i++) {
             for (int j = 0; j < bias.length; j++) {
-                System.out.println("i, j:\n" + i + ", " + j);
-                System.out.println("bias: " + bias[j][i]);
-                System.out.println("hI1: " + hiddenInput1[j][i]);
-                System.out.println("hI2: " + hiddenInput2[j][i]);
 
                 revisedBias[j][i] = bias[j][i] - (eta / 2) * (hiddenInput1[j][i] + hiddenInput2[j][i]);
-                Array.print(revisedBias, "rbTemp");
             }
         }
         return revisedBias;
@@ -210,6 +205,55 @@ public class Net {
             }
         }
         return revisedWeights;
+    }
+
+    // input training training weights and biases
+    // return revised weights and biases
+    static double[][][] miniBatch(double[][][] trainingCases, double[][][] weightsBiases) {
+        /// Training Case 1
+        // double[][][] revisedWeightsBiases = new
+        /// double[weightsBiases.length][weightsBiases[0].length][weightsBiases[0][0].length];
+        double[][] myOut = sigmoid(trainingCases[0], weightsBiases[0], weightsBiases[1]);
+        double[][] myOut2 = sigmoid(myOut, weightsBiases[2], weightsBiases[3]);
+        double[][] dLayer2 = backpropLast(myOut2, trainingCases[1]);
+        double[][] gradWeight2 = gradientOfWeights(dLayer2, myOut);
+        double[][] dLayer1 = backpropRest(dLayer2, weightsBiases[2], myOut);
+        double[][] gradWeight1 = gradientOfWeights(dLayer1, trainingCases[0]);
+
+        /// Training Case 2
+        double[][] my2Out = sigmoid(trainingCases[2], weightsBiases[0], weightsBiases[1]);
+        double[][] my2Out2 = sigmoid(my2Out, weightsBiases[2], weightsBiases[3]);
+        double[][] d2layer2 = backpropLast(my2Out2, trainingCases[3]);
+        double[][] grad2Weight2 = gradientOfWeights(d2layer2, my2Out);
+        double[][] d2Layer1 = backpropRest(d2layer2, weightsBiases[2], my2Out);
+        double[][] grad2Weight1 = gradientOfWeights(d2Layer1, trainingCases[2]);
+
+        double eta = 10;
+
+        double[][] rW1 = revisedWeights(weightsBiases[0], gradWeight1, grad2Weight1, eta);
+        double[][] rB1 = revisedBias(weightsBiases[1], dLayer1, d2Layer1, eta);
+        /// layer 2 biases and weights
+        double[][] rW2 = revisedWeights(weightsBiases[2], gradWeight2, grad2Weight2, eta);
+        double[][] rB2 = revisedBias(weightsBiases[3], dLayer2, d2layer2, eta);
+
+        double[][][] revisedWeightsBiases = { rW1, rB1, rW2, rB2 };
+        return revisedWeightsBiases;
+    }
+
+    static void epoch(double[][][][] packedInfo, int epochNum) {
+        System.out.println("Epoch: " + epochNum);
+        double[][][] mB = miniBatch(packedInfo[1], packedInfo[0]);
+        double[][][] mB2 = miniBatch(packedInfo[2], mB);
+        Array.print(mB2[0], "rW1");
+        Array.print(mB2[1], "rB1");
+        Array.print(mB2[2], "rW2");
+        Array.print(mB2[3], "rB2");
+
+        epochNum -= 1;
+        double[][][][] pack = { mB2, packedInfo[0], packedInfo[1] };
+        if (epochNum > 0) {
+            epoch(pack, (epochNum));
+        }
     }
 
     static Scanner csvReader(String fileName) throws FileNotFoundException {
@@ -232,69 +276,42 @@ public class Net {
     // am I going to make a class system for this lol
 
     public static void main(String[] csv_file_name) {
-
-        // mini-batch #1
-        // training case 1
-        double[][] xTrain1 = { { 0 }, { 1 }, { 0 }, { 1 } };
-        double[][] yTrain1 = { { 0 }, { 1 } };
-
-        // training case 2
-        double[][] xTrain2 = { { 1 }, { 0 }, { 1 }, { 0 } };
-        double[][] yTrain2 = { { 1 }, { 0 } };
-
-        /////////////////////////////////////////////////////////
-
-        // mini-batch #2
-        // training case 1
-        double[][] x2Train1 = { { 0 }, { 1 }, { 0 }, { 1 } };
-        double[][] y2Train1 = { { 0 }, { 1 } };
-
-        // training case 2
-        double[][] x2Train2 = { { 1 }, { 0 }, { 1 }, { 0 } };
-        double[][] y2Train2 = { { 1 }, { 0 } };
-
-        /////////////////////////////////////////////////////////
-
-        // for both batches
+        /* Epoch 1 */
+        /// for both batches
         double[][] weight1 = { { -0.21, 0.72, -0.25, 1 }, { -0.94, -0.41, -0.47, 0.63 }, { 0.15, 0.55, -0.49, -0.75 } };
         double[][] bias1 = { { 0.1 }, { -0.36 }, { -0.31 } };
 
         double[][] weight2 = { { 0.76, 0.48, -0.73 }, { 0.34, 0.89, -0.23 } };
         double[][] bias2 = { { 0.16 }, { -0.46 } };
 
-        // Training Case 1
+        // mini-batch #1
+        /// training case 1
+        double[][] xTrain1 = { { 0 }, { 1 }, { 0 }, { 1 } };
+        double[][] yTrain1 = { { 0 }, { 1 } };
+        /// training case 2
+        double[][] xTrain2 = { { 1 }, { 0 }, { 1 }, { 0 } };
+        double[][] yTrain2 = { { 1 }, { 0 } };
 
-        double[][] myOut = sigmoid(xTrain1, weight1, bias1);
-        double[][] myOut2 = sigmoid(myOut, weight2, bias2);
-        // backward pass through layer 2 (the 'output' or 3rd layer) of the network
-        double[][] dLayer2 = backpropLast(myOut2, yTrain1);
-        double[][] gradWeight2 = gradientOfWeights(dLayer2, myOut);
-        double[][] dLayer1 = backpropRest(dLayer2, weight2, myOut);
-        double[][] gradWeight1 = gradientOfWeights(dLayer1, xTrain1);
+        // mini-batch #2
+        /// training case 1
+        double[][] x2Train1 = { { 0 }, { 0 }, { 1 }, { 1 } };
+        double[][] y2Train1 = { { 0 }, { 1 } };
+        double[][] x2Train2 = { { 1 }, { 1 }, { 0 }, { 0 } };
+        double[][] y2Train2 = { { 1 }, { 0 } };
 
-        // Training Case 2
-        // uses the same weights as training case 1
-        double[][] my2Out = sigmoid(xTrain2, weight1, bias1);
-        double[][] my2Out2 = sigmoid(my2Out, weight2, bias2);
-        double[][] d2layer2 = backpropLast(my2Out2, yTrain2);
-        double[][] grad2Weight2 = gradientOfWeights(d2layer2, my2Out);
-        double[][] d2Layer1 = backpropRest(d2layer2, weight2, my2Out);
-        double[][] grad2Weight1 = gradientOfWeights(d2Layer1, xTrain2);
+        // packing
+        double[][][] tc1compact = { xTrain1, yTrain1, xTrain2, yTrain2 };
+        double[][][] tc2compact = { x2Train1, y2Train1, x2Train2, y2Train2 };
+        double[][][] wbcompact = { weight1, bias1, weight2, bias2 };
 
-        Array.print(gradWeight1, "gradWeight1"); // case 1
-        Array.print(grad2Weight1, "grad2Weight1"); // case 2
+        // more packing
 
-        // revising biases and weights
-        double eta = 10;
-        // layer 1 biases and weights
-        double[][] rB1 = revisedBias(bias1, dLayer1, d2Layer1, eta);
-        double[][] rW1 = revisedWeights(weight1, gradWeight1, grad2Weight1, eta);
-        // layer 2 biases and weights
-        double[][] rB2 = revisedBias(bias2, dLayer2, d2layer2, eta);
-        double[][] rW2 = revisedWeights(weight2, gradWeight2, grad2Weight2, eta);
+        double[][][][] packed = { wbcompact, tc1compact, tc2compact };
 
-        Array.print(rW1, "rw1");
-        Array.print(rW2, "rw2");
+        /////////////////////////////////////////////////////////
+
+        epoch(packed, 2);
+
     }
 
 }
