@@ -1,7 +1,8 @@
 import java.io.*;
 import java.util.Scanner;
-import mB.MiniBatch;
-import mB.Array;
+
+import background.Array;
+import background.MiniBatch;
 
 public class Net {
 
@@ -184,7 +185,7 @@ public class Net {
         return biasGradient;
     }
 
-    static double[][] revisedBias(double[][] bias, double[][] hiddenInput1, double[][] hiddenInput2, double eta) {
+    static double[][] reviseBias(double[][] bias, double[][] hiddenInput1, double[][] hiddenInput2, double eta) {
         double[][] revisedBias = new double[bias.length][bias[0].length];
         for (int i = 0; i < bias[0].length; i++) {
             for (int j = 0; j < bias.length; j++) {
@@ -195,8 +196,7 @@ public class Net {
         return revisedBias;
     }
 
-    // c27 - (eta/2) * (w27+ax27)
-    static double[][] revisedWeights(double[][] originalWeights, double[][] gW1, double[][] gW2, double eta) {
+    static double[][] reviseWeights(double[][] originalWeights, double[][] gW1, double[][] gW2, double eta) {
         double[][] revisedWeights = new double[originalWeights.length][originalWeights[0].length];
         for (int i = 0; i < originalWeights[0].length; i++) {
             for (int j = 0; j < originalWeights.length; j++) {
@@ -211,8 +211,6 @@ public class Net {
     // return revised weights and biases
     static double[][][] miniBatch(double[][][] trainingCases, double[][][] weightsBiases) {
         /// Training Case 1
-        // double[][][] revisedWeightsBiases = new
-        /// double[weightsBiases.length][weightsBiases[0].length][weightsBiases[0][0].length];
         double[][] myOut = sigmoid(trainingCases[0], weightsBiases[0], weightsBiases[1]);
         double[][] myOut2 = sigmoid(myOut, weightsBiases[2], weightsBiases[3]);
         double[][] dLayer2 = backpropLast(myOut2, trainingCases[1]);
@@ -228,13 +226,14 @@ public class Net {
         double[][] d2Layer1 = backpropRest(d2layer2, weightsBiases[2], my2Out);
         double[][] grad2Weight1 = gradientOfWeights(d2Layer1, trainingCases[2]);
 
+        // TODO: What is eta?
         double eta = 10;
 
-        double[][] rW1 = revisedWeights(weightsBiases[0], gradWeight1, grad2Weight1, eta);
-        double[][] rB1 = revisedBias(weightsBiases[1], dLayer1, d2Layer1, eta);
+        double[][] rW1 = reviseWeights(weightsBiases[0], gradWeight1, grad2Weight1, eta);
+        double[][] rB1 = reviseBias(weightsBiases[1], dLayer1, d2Layer1, eta);
         /// layer 2 biases and weights
-        double[][] rW2 = revisedWeights(weightsBiases[2], gradWeight2, grad2Weight2, eta);
-        double[][] rB2 = revisedBias(weightsBiases[3], dLayer2, d2layer2, eta);
+        double[][] rW2 = reviseWeights(weightsBiases[2], gradWeight2, grad2Weight2, eta);
+        double[][] rB2 = reviseBias(weightsBiases[3], dLayer2, d2layer2, eta);
 
         double[][][] revisedWeightsBiases = { rW1, rB1, rW2, rB2 };
         return revisedWeightsBiases;

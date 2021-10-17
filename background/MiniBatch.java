@@ -1,4 +1,4 @@
-package mB;
+package background;
 
 public class MiniBatch {
 
