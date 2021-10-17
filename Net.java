@@ -242,17 +242,17 @@ public class Net {
 
     static void epoch(double[][][][] packedInfo, int epochNum) {
         System.out.println("Epoch: " + epochNum);
-        double[][][] mB = miniBatch(packedInfo[1], packedInfo[0]);
-        double[][][] mB2 = miniBatch(packedInfo[2], mB);
-        Array.print(mB2[0], "rW1");
-        Array.print(mB2[1], "rB1");
-        Array.print(mB2[2], "rW2");
-        Array.print(mB2[3], "rB2");
+        double[][][] miniBatch1 = miniBatch(packedInfo[1], packedInfo[0]);
+        double[][][] miniBatch2 = miniBatch(packedInfo[2], miniBatch1);
+        Array.print(miniBatch2[0], "rW1");
+        Array.print(miniBatch2[1], "rB1");
+        Array.print(miniBatch2[2], "rW2");
+        Array.print(miniBatch2[3], "rB2");
 
         epochNum -= 1;
-        double[][][][] pack = { mB2, packedInfo[0], packedInfo[1] };
+        double[][][][] newPack = { miniBatch2, packedInfo[1], packedInfo[2] };
         if (epochNum > 0) {
-            epoch(pack, (epochNum));
+            epoch(newPack, (epochNum));
         }
     }
 
@@ -310,7 +310,7 @@ public class Net {
 
         /////////////////////////////////////////////////////////
 
-        epoch(packed, 2);
+        epoch(packed, 6);
 
     }
 
