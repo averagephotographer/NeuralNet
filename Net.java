@@ -46,7 +46,8 @@ public class Net {
             return true;
         } else {
             // error if the arrays aren't addable
-            // System.out.println("arrays aren't addable");
+            System.out.println("arrays aren't addable");
+            System.exit(0);
             // printSize(array1, "a1");
             // printSize(array2, "a2");
             return false;
@@ -177,7 +178,7 @@ public class Net {
         double[][] biasGradient = new double[prevMyOut.length][prevMyOut[0].length];
         for (int k = 0; k < prevMyOut[0].length; k++) {
             for (int j = 0; j < weights[0].length; j++) {
-                // could I transpose dLayer to make it simpler and do the dot product
+                // could I transpose dLayer to make it simpler and do the dot product?
                 // this feels kinda sketch
                 biasGradient[j][k] += (weights[k][j] * dLayer[k][0] + weights[k + 1][j] * dLayer[k + 1][0])
                         * (prevMyOut[j][0] * (1 - prevMyOut[j][0]));
@@ -219,6 +220,7 @@ public class Net {
         double[][] dLayer1 = backpropRest(dLayer2, weights[1], myOut);
         double[][] gradWeight1 = gradientOfWeights(dLayer1, train[0]);
 
+        // TODO: put training cases in it's own function
         /// Training Case 2
         double[][] my2Out = sigmoid(train[2], weights[0], biases[0]);
         double[][] my2Out2 = sigmoid(my2Out, weights[1], biases[1]);
@@ -237,11 +239,6 @@ public class Net {
         double[][] rB2 = reviseBias(biases[1], dLayer2, d2layer2, eta);
 
         double[][][] revisedWeightsBiases = { rW1, rB1, rW2, rB2 };
-
-        // Array.print(rW1, "rw1");
-        // Array.print(rB1, "rb1");
-        // Array.print(rW2, "rw2");
-        // Array.print(rB2, "rb2");
 
         return revisedWeightsBiases;
     }
@@ -284,10 +281,6 @@ public class Net {
             weights = mbOut[0];
             biases = mbOut[1];
         }
-        Array.print(weights[0], "weights");
-        Array.print(weights[1], "weights");
-        Array.print(biases[0], "biases");
-        Array.print(biases[1], "biases");
     }
 
     static Scanner csvReader(String fileName) throws FileNotFoundException {
@@ -303,11 +296,6 @@ public class Net {
         csvData.close();
         return csvData;
     }
-
-    // function to combine a bunch of other functions
-    // inputs training data
-    // returns double[][] with
-    // am I going to make a class system for this lol
 
     public static void main(String[] csv_file_name) {
         /* Epoch 1 */
@@ -340,15 +328,10 @@ public class Net {
         double[][][] weights = { weight1, weight2 };
         double[][][] biases = { bias1, bias2 };
 
+        // more packing
         double[][][][] batches = { batch1, batch2 };
 
-        // more packing
-
         /////////////////////////////////////////////////////////
-
-        // double[][][][] mbOutput = miniBatch(weights, biases, batches);
-        // double[][][] rw = mbOutput[0];
-        // double[][][] rb = mbOutput[1];
 
         epoch(6, weights, biases, batches);
 
