@@ -5,7 +5,7 @@ JC = javac
 		$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
-		background/Array.java \
+		background/A.java \
 		background/MiniBatch.java \
 		Net.java
 
