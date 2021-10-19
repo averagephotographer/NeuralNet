@@ -1,5 +1,13 @@
+
+/*
+Christopher Tullier
+102-58-973
+Assignment 2 - MNIST
+RNN that learns how to recognize handwritten digits from the MNIST databse
+*/
 import java.io.*;
 import java.util.Scanner;
+import java.util.Random;
 
 import background.Array;
 import background.MiniBatch;
@@ -161,7 +169,7 @@ public class Net {
         return sigmoidOut;
     }
 
-    // final output layer math
+    // last layer backprop
     static double[][] backpropLast(double[][] output, double[][] trainData) {
         double[][] ones = onesArray(trainData.length, trainData[0].length);
         // should I use dot prod to make this simpler?
@@ -173,8 +181,8 @@ public class Net {
         return dotProduct(gradientBiases, transpose(output));
     }
 
-    // everything that's not last
-    static double[][] backpropRest(double[][] dLayer, double[][] weights, double[][] prevMyOut) {
+    // backprop for the middle layers
+    static double[][] backprop(double[][] dLayer, double[][] weights, double[][] prevMyOut) {
         double[][] biasGradient = new double[prevMyOut.length][prevMyOut[0].length];
         for (int k = 0; k < prevMyOut[0].length; k++) {
             for (int j = 0; j < weights[0].length; j++) {
@@ -217,7 +225,7 @@ public class Net {
         double[][] myOut2 = sigmoid(myOut, weights[1], biases[1]);
         double[][] dLayer2 = backpropLast(myOut2, train[1]);
         double[][] gradWeight2 = gradientOfWeights(dLayer2, myOut);
-        double[][] dLayer1 = backpropRest(dLayer2, weights[1], myOut);
+        double[][] dLayer1 = backprop(dLayer2, weights[1], myOut);
         double[][] gradWeight1 = gradientOfWeights(dLayer1, train[0]);
 
         // TODO: put training cases in it's own function
@@ -226,17 +234,17 @@ public class Net {
         double[][] my2Out2 = sigmoid(my2Out, weights[1], biases[1]);
         double[][] d2layer2 = backpropLast(my2Out2, train[3]);
         double[][] grad2Weight2 = gradientOfWeights(d2layer2, my2Out);
-        double[][] d2Layer1 = backpropRest(d2layer2, weights[1], my2Out);
+        double[][] d2Layer1 = backprop(d2layer2, weights[1], my2Out);
         double[][] grad2Weight1 = gradientOfWeights(d2Layer1, train[2]);
 
         // TODO: What is eta?
-        double eta = 10;
+        double learningRate = 10;
 
-        double[][] rW1 = reviseWeights(weights[0], gradWeight1, grad2Weight1, eta);
-        double[][] rB1 = reviseBias(biases[0], dLayer1, d2Layer1, eta);
+        double[][] rW1 = reviseWeights(weights[0], gradWeight1, grad2Weight1, learningRate);
+        double[][] rB1 = reviseBias(biases[0], dLayer1, d2Layer1, learningRate);
         /// layer 2 biases and weights
-        double[][] rW2 = reviseWeights(weights[1], gradWeight2, grad2Weight2, eta);
-        double[][] rB2 = reviseBias(biases[1], dLayer2, d2layer2, eta);
+        double[][] rW2 = reviseWeights(weights[1], gradWeight2, grad2Weight2, learningRate);
+        double[][] rB2 = reviseBias(biases[1], dLayer2, d2layer2, learningRate);
 
         double[][][] revisedWeightsBiases = { rW1, rB1, rW2, rB2 };
 
@@ -274,31 +282,116 @@ public class Net {
         return wb;
     }
 
-    static void epoch(int numEpochs, double[][][] weights, double[][][] biases, double[][][][] batches) {
-        System.out.println("Epoch " + numEpochs + ": ");
+    static double[][][][] epoch(int numEpochs, double[][][] weights, double[][][] biases, double[][][][] batches) {
+        int count = 1;
         for (int i = 0; i < numEpochs; i++) {
+            System.out.println("Epoch " + count + ": ");
             double[][][][] mbOut = miniBatch(weights, biases, batches);
             weights = mbOut[0];
             biases = mbOut[1];
+            count++;
         }
+        double[][][][] output = { weights, biases };
+        Array.print(weights[0], "weight");
+        Array.print(weights[1], "weight");
+        Array.print(biases[0], "biases");
+        Array.print(biases[1], "biases");
+        return output;
     }
 
-    static Scanner csvReader(String fileName) throws FileNotFoundException {
+    static double[][] csvReader(String fileName) throws FileNotFoundException {
         // https://www.javatpoint.com/how-to-read-csv-file-in-java
         // pulls csv into java, prints it
         // filename: mnist_test.csv
-
+        double[][] rawData = new double[60000][785];
         Scanner csvData = new Scanner(new File(fileName));
-        csvData.useDelimiter(",");
+        csvData.useDelimiter(",|\r|\n");
+        int x = 0;
+        int y = 0;
         while (csvData.hasNext()) {
-            System.out.print(csvData.next());
+            String s = csvData.next();
+            rawData[x][y] = Double.parseDouble(s);
+            y++;
+            if (y == 785) {
+                y = 0;
+                x++;
+            }
         }
+        int counter = 0;
+        // prints last row in the datset
+
+        int trainSize = 59999;
+        int testSize = 9999;
+
+        // options: testSize, trainSize
+        int size = testSize;
+
+        // prints integers as they come in
+        // System.out.println("number: " + rawData[size][0]);
+        for (int i = 1; i < 785; i++) {
+            // System.out.print(rawData[size][i] + " ");
+            counter++;
+            if (counter > 27) {
+                // System.out.println();
+                counter = 0;
+            }
+        }
+        System.out.println();
         csvData.close();
-        return csvData;
+        return rawData;
+
     }
 
-    public static void main(String[] csv_file_name) {
-        /* Epoch 1 */
+    // fn to take raw csv and take off the classifier row
+
+    // input array size
+    // return array of that size with randomized digits
+    static double[][] randomArray(int x, int y) {
+        double[][] randArray = new double[x][y];
+        Random r = new Random();
+
+        for (int i = 0; i < x; i++) {
+            for (int j = 0; j < y; j++) {
+                randArray[i][j] = r.nextDouble();
+            }
+        }
+        return randArray;
+    }
+
+    public static void main(String[] csv_file_name) throws FileNotFoundException {
+
+        String test = "data/mnist_test.csv";
+        String train = "data/mnist_train.csv";
+        int[] sizes = { 784, 30, 10 };
+        double[][] rawCSV = csvReader(test);
+
+        // desired output array
+        double[][] desiredOutput = new double[9999][10];
+
+        // separates the starting number from the data
+        double[][] numberData = new double[9999][783];
+
+        for (int i = 0; i < numberData.length; i++) {
+            for (int j = 0; j < (numberData[0].length); j++) {
+                // just the image data
+                numberData[i][j] = rawCSV[i][j + 1];
+            }
+            int value = (int) Math.round(rawCSV[i][0]);
+
+            // sets up desired output array
+            desiredOutput[i][value] = 1.0;
+        }
+
+        // randomly initialize biases
+        // biases = { 0, 1, 2, 3, ..., 30 }
+        double[][] csvBiases1 = randomArray(1, sizes[1]);
+        // double[][] csvBiases2 = randomArray(1, y);
+
+        // randomly initialize weights
+        // weights = { 0, 1, 2, 3 ..., 783 }
+        double[][] csvWeights1 = randomArray(sizes[2], sizes[1]);
+        // double[][] csvWeights2 = randomArray(x, y);
+
         /// for both batches
         double[][] weight1 = { { -0.21, 0.72, -0.25, 1 }, { -0.94, -0.41, -0.47, 0.63 }, { 0.15, 0.55, -0.49, -0.75 } };
         double[][] weight2 = { { 0.76, 0.48, -0.73 }, { 0.34, 0.89, -0.23 } };
@@ -323,17 +416,18 @@ public class Net {
         double[][] y2Train2 = { { 1 }, { 0 } };
 
         // packing
-        double[][][] batch1 = { xTrain1, yTrain1, xTrain2, yTrain2 };
-        double[][][] batch2 = { x2Train1, y2Train1, x2Train2, y2Train2 };
+        double[][][] case1 = { xTrain1, yTrain1, xTrain2, yTrain2 };
+        double[][][] case2 = { x2Train1, y2Train1, x2Train2, y2Train2 };
         double[][][] weights = { weight1, weight2 };
         double[][][] biases = { bias1, bias2 };
 
         // more packing
-        double[][][][] batches = { batch1, batch2 };
+        double[][][][] batches = { case1, case2 };
 
         /////////////////////////////////////////////////////////
 
-        epoch(6, weights, biases, batches);
+        // epoch(6, weights, biases, batches);
+        // Array.print(randomArray(4, 12), "randArray");
 
     }
 
