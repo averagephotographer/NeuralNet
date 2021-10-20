@@ -374,6 +374,38 @@ public class Net {
 
     public static void main(String[] csv_file_name) throws FileNotFoundException {
 
+        String test = "data/mnist_test.csv";
+        String train = "data/mnist_train.csv";
+        int[] sizes = { 784, 30, 10 };
+        double[][] rawCSV = csvReader(test);
+
+        // desired output array
+        double[][] desiredOutput = new double[9999][10];
+
+        // separates the starting number from the data
+        double[][] numberData = new double[9999][783];
+
+        for (int i = 0; i < numberData.length; i++) {
+            for (int j = 0; j < (numberData[0].length); j++) {
+                // just the image data
+                numberData[i][j] = rawCSV[i][j + 1];
+            }
+            int value = (int) Math.round(rawCSV[i][0]);
+
+            // sets up desired output array
+            desiredOutput[i][value] = 1.0;
+        }
+
+        // randomly initialize biases
+        // biases = { 0, 1, 2, 3, ..., 30 }
+        double[][] csvBiases1 = randomArray(1, sizes[1]);
+        // double[][] csvBiases2 = randomArray(1, y);
+
+        // randomly initialize weights
+        // weights = { 0, 1, 2, 3 ..., 783 }
+        double[][] csvWeights1 = randomArray(sizes[2], sizes[1]);
+        // double[][] csvWeights2 = randomArray(x, y);
+
         /// for both batches
         double[][] weight1 = { { -0.21, 0.72, -0.25, 1 }, { -0.94, -0.41, -0.47, 0.63 }, { 0.15, 0.55, -0.49, -0.75 } };
         double[][] weight2 = { { 0.76, 0.48, -0.73 }, { 0.34, 0.89, -0.23 } };
