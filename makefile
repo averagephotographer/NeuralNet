@@ -7,7 +7,9 @@ JC = javac
 CLASSES = \
 		background/A.java \
 		background/MiniBatch.java \
-		Net.java
+		background/Network.java \
+		Net.java \
+		Main.java
 
 default: classes
 
