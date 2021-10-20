@@ -53,7 +53,7 @@ public class Array {
     public static void size(double[][] arr, String name) {
         System.out.println();
         System.out.println("h x w: " + name);
-        System.out.println(arr.length + " x " + arr[0].length);
+        System.out.println(arr.length + " x " + arr[1].length);
         System.out.println();
     }
 

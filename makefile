@@ -8,6 +8,7 @@ CLASSES = \
 		background/A.java \
 		background/MiniBatch.java \
 		background/Network.java \
+		background/Array.java \
 		Net.java \
 		Main.java
 

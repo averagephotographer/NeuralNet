@@ -7,6 +7,9 @@ RNN that learns how to recognize handwritten digits from the MNIST databse
 */
 import java.io.*;
 import java.util.Scanner;
+
+import javax.naming.spi.DirStateFactory.Result;
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -372,6 +375,19 @@ public class Net {
         return randArray;
     }
 
+    // https://stackoverflow.com/questions/33144667/concatenating-two-arrays-with-alternating-values
+    static double[][] zip(double[][] first, double[][] second) {
+        double[][] output = new double[first.length + second.length][first[0].length + second[0].length];
+        int index = 0;
+        final int minLen = Math.min(first.length, second.length);
+        for (int i = 0; i < minLen; i++) {
+            output[index++] = first[i];
+            output[index++] = second[i];
+        }
+
+        return output;
+    }
+
     public static void main(String[] csv_file_name) throws FileNotFoundException {
 
         String test = "data/mnist_test.csv";
@@ -379,11 +395,14 @@ public class Net {
         int[] sizes = { 784, 30, 10 };
         double[][] rawCSV = csvReader(test);
 
+        // 10000 test
+        // 60000 train
+
         // desired output array
-        double[][] desiredOutput = new double[9999][10];
+        double[][] desiredOutput = new double[10000][10];
 
         // separates the starting number from the data
-        double[][] numberData = new double[9999][783];
+        double[][] numberData = new double[10000][784];
 
         for (int i = 0; i < numberData.length; i++) {
             for (int j = 0; j < (numberData[0].length); j++) {
@@ -395,16 +414,24 @@ public class Net {
             // sets up desired output array
             desiredOutput[i][value] = 1.0;
         }
-
-        // randomly initialize biases
-        // biases = { 0, 1, 2, 3, ..., 30 }
-        double[][] csvBiases1 = randomArray(1, sizes[1]);
-        // double[][] csvBiases2 = randomArray(1, y);
+        double[][] zipped = zip(desiredOutput, numberData);
 
         // randomly initialize weights
         // weights = { 0, 1, 2, 3 ..., 783 }
-        double[][] csvWeights1 = randomArray(sizes[2], sizes[1]);
-        // double[][] csvWeights2 = randomArray(x, y);
+        double[][] csvWeights1 = randomArray(sizes[1], sizes[0]);
+        double[][] csvWeights2 = randomArray(sizes[2], sizes[1]);
+
+        // randomly initialize biases
+        // biases = { 0, 1, 2, 3, ..., 30 }
+        double[][] csvBiases1 = randomArray(sizes[1], sizes[0]);
+        double[][] csvBiases2 = randomArray(sizes[2], sizes[0]);
+
+        double[][][] csvWeights = { csvWeights1, csvWeights2 };
+        double[][][] csvBiases = { csvBiases1, csvBiases2 };
+
+        double[][][] csvCases = new double[0][0][0];
+
+        epoch(1, csvWeights, csvBiases, csvCases);
 
         /// for both batches
         double[][] weight1 = { { -0.21, 0.72, -0.25, 1 }, { -0.94, -0.41, -0.47, 0.63 }, { 0.15, 0.55, -0.49, -0.75 } };
@@ -434,12 +461,9 @@ public class Net {
         double[][][] weights = { weight1, weight2 };
         double[][][] biases = { bias1, bias2 };
 
-        // more packing
-
         /////////////////////////////////////////////////////////
 
-        epoch(6, weights, biases, cases);
-        // Array.print(randomArray(4, 12), "randArray");
+        // epoch(6, weights, biases, cases);
 
     }
 
