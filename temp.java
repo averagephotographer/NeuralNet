@@ -1,3 +1,46 @@
+// String test = "data/mnist_test.csv";
+        // String train = "data/mnist_train.csv";
+        // int[] sizes = { 784, 30, 10 };
+        // double[][][] rawCSV = csvReader(test);
+
+        // int testSize = 10000;
+        // int trainSize = 60000;
+        // int length = testSize;
+        // // desired output array
+        // double[][][] desiredOutput = new double[length][10][1];
+
+        // // // separates the starting number from the data
+        // double[][][] numberData = new double[length][784][1];
+
+        // for (int i = 0; i < numberData.length; i++) {
+        // for (int j = 0; j < (numberData[0].length); j++) {
+        // // just the image data
+        // numberData[i][j] = rawCSV[i][j + 1];
+        // }
+        // int value = (int) Math.round(rawCSV[i][0][0]);
+
+        // // sets up desired output array
+        // desiredOutput[i][value][0] = 1.0;
+        // }
+
+        // // double[][][] zipped = zip(numberData, desiredOutput);x
+
+        // // randomly initialize weights
+        // double[][] csvWeights1 = randomArray(sizes[0], sizes[1]);
+        // double[][] csvBiases1 = randomArray(sizes[1], sizes[2]);
+
+        // // randomly initialize biases
+        // double[][] csvWeights2 = randomArray(sizes[1], sizes[2]);
+        // double[][] csvBiases2 = randomArray(1, sizes[2]);
+
+        // double[][][] csvWeights = { csvWeights1, csvWeights2 };
+        // double[][][] csvBiases = { csvBiases1, csvBiases2 };
+
+        // double[][][] csvCases = new double[1][1][1];
+
+        // epoch(1, csvWeights, csvBiases, zipped);
+
+
 
 // scalar multiplication of elements in two arrays
     static double[][] multiplyScalar(double[][] a1, double[][] a2) {

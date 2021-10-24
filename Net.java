@@ -105,9 +105,6 @@ public class Net {
         return arrayDiff;
     }
 
-    // double[][] sigmoidOut = new double[weight.length][bias[0].length];
-    // double[][] prod = dotProduct(weight, input);
-    // double[][] zValue = addArrays(prod, bias);
     static double[] sigmoid(double[] zValue) {
         double[] sigmoidOut = new double[zValue.length];
         for (int i = 0; i < zValue.length; i++) {
@@ -116,49 +113,36 @@ public class Net {
         return sigmoidOut;
     }
 
+    // this is a forwardpass, predict is what it's called in tf
+    // this input could be a Model class object
+    // include all weights, all biases
+    // include all training data as the input
+    static double[][] predict(double[][][] weights, double[][] biases, double[][] inputs) {
+        int lastBiasLength = biases[biases.length - 1].length;
+
+        // initialize final output array
+        // inputs.length is how many inputs we have
+        // lastBiasLength is how many nodes are in the output (10 for mnist)
+        double[][] Y = new double[inputs.length][lastBiasLength];
+
+        // could also use weights.lenth could also be here
+        int numLayers = biases.length;
+
+        // loop over all inputs
+        for (int i = 0; i < inputs.length; i++) {
+            double[] currentInput = inputs[i];
+
+            // loop over desired length of layers
+            for (int j = 0; j < numLayers; j++) {
+                double[] zValue = addArrays(dotProduct(weights[j], currentInput), biases[j]);
+                currentInput = sigmoid(zValue);
+            }
+            Y[i] = currentInput;
+        }
+        return Y;
+    }
+
     public static void main(String[] csv_file_name) throws FileNotFoundException {
-
-        // String test = "data/mnist_test.csv";
-        // String train = "data/mnist_train.csv";
-        // int[] sizes = { 784, 30, 10 };
-        // double[][][] rawCSV = csvReader(test);
-
-        // int testSize = 10000;
-        // int trainSize = 60000;
-        // int length = testSize;
-        // // desired output array
-        // double[][][] desiredOutput = new double[length][10][1];
-
-        // // // separates the starting number from the data
-        // double[][][] numberData = new double[length][784][1];
-
-        // for (int i = 0; i < numberData.length; i++) {
-        // for (int j = 0; j < (numberData[0].length); j++) {
-        // // just the image data
-        // numberData[i][j] = rawCSV[i][j + 1];
-        // }
-        // int value = (int) Math.round(rawCSV[i][0][0]);
-
-        // // sets up desired output array
-        // desiredOutput[i][value][0] = 1.0;
-        // }
-
-        // // double[][][] zipped = zip(numberData, desiredOutput);x
-
-        // // randomly initialize weights
-        // double[][] csvWeights1 = randomArray(sizes[0], sizes[1]);
-        // double[][] csvBiases1 = randomArray(sizes[1], sizes[2]);
-
-        // // randomly initialize biases
-        // double[][] csvWeights2 = randomArray(sizes[1], sizes[2]);
-        // double[][] csvBiases2 = randomArray(1, sizes[2]);
-
-        // double[][][] csvWeights = { csvWeights1, csvWeights2 };
-        // double[][][] csvBiases = { csvBiases1, csvBiases2 };
-
-        // double[][][] csvCases = new double[1][1][1];
-
-        // epoch(1, csvWeights, csvBiases, zipped);
 
         /// for both batches
         double[][] weight1 = { { -0.21, 0.72, -0.25, 1 }, { -0.94, -0.41, -0.47, 0.63 }, { 0.15, 0.55, -0.49, -0.75 } };
@@ -193,10 +177,17 @@ public class Net {
         // Arrays.toString() to print arrays
 
         // h is a in O'Neal's program
-        double[] h = sigmoid(addArrays(dotProduct(weights[0], inputs[0]), biases[0]));
+        // double[] h = sigmoid(addArrays(dotProduct(weights[0], inputs[0]),
+        // biases[0]));
 
-        System.out.println(Arrays.toString(h));
+        // System.out.println(Arrays.toString(h));
 
+        // forward pass
+
+        double[][] finalOut = predict(weights, biases, inputs);
+
+        for (int i = 0; i < inputs.length; i++) {
+            System.out.print(Arrays.toString(finalOut[i]));
+        }
     }
-
 }
