@@ -254,20 +254,21 @@ public class Net {
         return revisedWeightsBiases;
     }
 
-    static double[][][][] miniBatch(double[][][] weights, double[][][] biases, double[][][] cases) {
-        int miniBatchSize = 2;
+    static double[][][][] miniBatch(double[][][] weights, double[][][] biases, double[][][] data) {
+        // changed batch size from 2->10 and the error went from -1000 to -2000
+        int miniBatchSize = 10;
         int caseSize = 2;
+        int batchLength = miniBatchSize * caseSize;
+        int numBatches = data.length / (caseSize * miniBatchSize);
 
-        int numBatches = cases.length / (caseSize * miniBatchSize);
-        double[][][][] batches = new double[numBatches][0][0][0];
-        for (int i = 0; i < cases.length; i++) {
-            int batchLength = 2 * cases.length / (caseSize * miniBatchSize);
+        double[][][][] batches = new double[numBatches][data.length][0][784];
+        for (int i = 0; i < data.length; i++) {
 
             int index1 = 0;
             int index2 = batchLength;
             for (int e = 0; e < (numBatches); e++) {
                 // Split cases here into their respective batches
-                batches[e] = Arrays.copyOfRange(cases, index1, index2);
+                batches[e] = Arrays.copyOfRange(data, index1, index2);
                 index1 += batchLength;
                 index2 += batchLength;
 
@@ -316,18 +317,19 @@ public class Net {
         return output;
     }
 
-    static double[][] csvReader(String fileName) throws FileNotFoundException {
+    static double[][][] csvReader(String fileName) throws FileNotFoundException {
         // https://www.javatpoint.com/how-to-read-csv-file-in-java
         // pulls csv into java, prints it
         // filename: mnist_test.csv
-        double[][] rawData = new double[60000][785];
+        double[][][] rawData = new double[60000][785][1];
         Scanner csvData = new Scanner(new File(fileName));
         csvData.useDelimiter(",|\r|\n");
         int x = 0;
         int y = 0;
         while (csvData.hasNext()) {
             String s = csvData.next();
-            rawData[x][y] = Double.parseDouble(s);
+            double[] tempData = { Double.parseDouble(s) };
+            rawData[x][y] = tempData;
             y++;
             if (y == 785) {
                 y = 0;
@@ -376,16 +378,18 @@ public class Net {
     }
 
     // https://stackoverflow.com/questions/33144667/concatenating-two-arrays-with-alternating-values
-    static double[][] zip(double[][] first, double[][] second) {
-        double[][] output = new double[first.length + second.length][first[0].length + second[0].length];
+    static double[][][] zip(double[][] first, double[][] second) {
+        double[][][] output = new double[first.length + second.length][first[0].length + second[0].length][0];
         int index = 0;
         final int minLen = Math.min(first.length, second.length);
         for (int i = 0; i < minLen; i++) {
-            output[index++] = first[i];
-            output[index++] = second[i];
+            double[][] temp1 = { first[i] };
+            double[][] temp2 = { second[i] };
+            output[index++] = temp1;
+            output[index++] = temp2;
         }
-
         return output;
+
     }
 
     public static void main(String[] csv_file_name) throws FileNotFoundException {
@@ -393,45 +397,44 @@ public class Net {
         String test = "data/mnist_test.csv";
         String train = "data/mnist_train.csv";
         int[] sizes = { 784, 30, 10 };
-        double[][] rawCSV = csvReader(test);
+        double[][][] rawCSV = csvReader(test);
 
-        // 10000 test
-        // 60000 train
-
+        int testSize = 10000;
+        int trainSize = 60000;
+        int length = testSize;
         // desired output array
-        double[][] desiredOutput = new double[10000][10];
+        double[][][] desiredOutput = new double[length][10][1];
 
-        // separates the starting number from the data
-        double[][] numberData = new double[10000][784];
+        // // separates the starting number from the data
+        double[][][] numberData = new double[length][784][1];
 
         for (int i = 0; i < numberData.length; i++) {
             for (int j = 0; j < (numberData[0].length); j++) {
                 // just the image data
                 numberData[i][j] = rawCSV[i][j + 1];
             }
-            int value = (int) Math.round(rawCSV[i][0]);
+            int value = (int) Math.round(rawCSV[i][0][0]);
 
             // sets up desired output array
-            desiredOutput[i][value] = 1.0;
+            desiredOutput[i][value][0] = 1.0;
         }
-        double[][] zipped = zip(desiredOutput, numberData);
+
+        // double[][][] zipped = zip(numberData, desiredOutput);x
 
         // randomly initialize weights
-        // weights = { 0, 1, 2, 3 ..., 783 }
-        double[][] csvWeights1 = randomArray(sizes[1], sizes[0]);
-        double[][] csvWeights2 = randomArray(sizes[2], sizes[1]);
+        double[][] csvWeights1 = randomArray(sizes[0], sizes[1]);
+        double[][] csvBiases1 = randomArray(sizes[1], sizes[2]);
 
         // randomly initialize biases
-        // biases = { 0, 1, 2, 3, ..., 30 }
-        double[][] csvBiases1 = randomArray(sizes[1], sizes[0]);
-        double[][] csvBiases2 = randomArray(sizes[2], sizes[0]);
+        double[][] csvWeights2 = randomArray(sizes[1], sizes[2]);
+        double[][] csvBiases2 = randomArray(1, sizes[2]);
 
         double[][][] csvWeights = { csvWeights1, csvWeights2 };
         double[][][] csvBiases = { csvBiases1, csvBiases2 };
 
-        double[][][] csvCases = new double[0][0][0];
+        double[][][] csvCases = new double[1][1][1];
 
-        epoch(1, csvWeights, csvBiases, csvCases);
+        // epoch(1, csvWeights, csvBiases, zipped);
 
         /// for both batches
         double[][] weight1 = { { -0.21, 0.72, -0.25, 1 }, { -0.94, -0.41, -0.47, 0.63 }, { 0.15, 0.55, -0.49, -0.75 } };
