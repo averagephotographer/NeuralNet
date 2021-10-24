@@ -142,6 +142,67 @@ public class Net {
         return Y;
     }
 
+    static void fit(int numEpochs, int learningRate, double[][][] weights, double[][] biases, double[][] inputs,
+            double[][] yTrain) {
+        int batchSize = 2;
+        int Xindex;
+
+        // pending changes
+        double[][][] weightsChanges = new double[weights.length][weights[0].length][weights[0][0].length];
+        double[][] biasesChanges = new double[biases.length][biases[0].length];
+
+        double[][][] weightsCurrent = weights;
+        double[][] biasesCurrent = biases;
+
+        // loop until epochs are done
+        for (int i = 0; i < numEpochs; i++) {
+            int numBatches = inputs.length / batchSize;
+            int lastLayerIndex = weightsChanges.length - 1;
+            double[][] batchCurr = new double[batchSize][inputs[0].length];
+            double[][] yTrainCurr = new double[batchSize][yTrain[0].length];
+
+            int batchCounter = 0;
+            batchCurr = Arrays.copyOfRange(inputs, batchCounter, batchCounter + batchSize);
+            yTrainCurr = Arrays.copyOfRange(yTrain, batchCounter, batchCounter + batchSize);
+
+            /// predict on batchSize
+            double[][] yCurr = predict(weightsCurrent, biasesCurrent, batchCurr);
+            batchCounter += batchSize;
+
+            // last layer weights
+            // Big X level
+            for (int j = 0; j < batchCurr.length; j++) {
+                // X[instance] level
+                for (int u = 0; u < weightsCurrent[lastLayerIndex].length; u++) {
+                    // neuron level (everyone shares layer term)
+                    double errorTerm = yCurr[j][u] * (1 - yCurr[j][u]) * (yTrainCurr[j][u] - yCurr[j][u]);
+                    for (int v = 0; v < weightsCurrent[lastLayerIndex][0].length; v++) {
+                        // node level (aka weights level of a particular neuron)
+                        weightsChanges[lastLayerIndex][u][v] += (learningRate * errorTerm * batchCurr[j][v]);
+                    }
+                }
+            }
+            // last layer biases
+            for (int j = 0; j < batchCurr.length; j++) {
+                // X[instance] level
+                for (int u = 0; u < weightsCurrent[lastLayerIndex].length; u++) {
+                    // neuron level (everyone shares layer term)
+                    double errorTerm = yCurr[j][u] * (1 - yCurr[j][u]) * (yTrainCurr[j][u] - yCurr[j][u]);
+                    for (int v = 0; v < weightsCurrent[lastLayerIndex][0].length; v++) {
+                        // node level (aka weights level of a particular neuron)
+                        weightsChanges[lastLayerIndex][u][v] += (learningRate * errorTerm * batchCurr[j][v]);
+                    }
+                }
+            }
+
+            /// Find gradient using J
+
+            /// update
+
+        }
+
+    }
+
     public static void main(String[] csv_file_name) throws FileNotFoundException {
 
         /// for both batches
