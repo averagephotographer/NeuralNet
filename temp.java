@@ -302,17 +302,7 @@
 
     // input array size
     // return array of that size with randomized digits
-    static double[][] randomArray(int x, int y) {
-        double[][] randArray = new double[x][y];
-        Random r = new Random();
 
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
-                randArray[i][j] = r.nextDouble();
-            }
-        }
-        return randArray;
-    }
 
     // https://stackoverflow.com/questions/33144667/concatenating-two-arrays-with-alternating-values
     static double[][][] zip(double[][] first, double[][] second) {
