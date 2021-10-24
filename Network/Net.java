@@ -123,7 +123,7 @@ public class Net {
         return sigmoidOut;
     }
 
-    // this is a forwardpass, predict is what it's called in tf
+    // this is a forward pass, predict is what it's called in tf
     // this input could be a Model class object
     // include all weights, all biases
     // include all training data as the input

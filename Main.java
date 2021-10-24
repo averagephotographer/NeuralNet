@@ -7,14 +7,13 @@ RNN that learns how to recognize handwritten digits from the MNIST databse
 */
 import java.io.*;
 import java.util.Scanner;
+import java.util.function.Predicate;
 
 import javax.management.monitor.StringMonitor;
 import javax.naming.spi.DirStateFactory.Result;
 
 import java.util.Arrays;
 
-import background.Array;
-import background.MiniBatch;
 import Network.Layer;
 import Network.Model;
 
@@ -70,6 +69,12 @@ class Main {
         int[] sizes = { 4, 3, 2 };
 
         Model myModel = new Model(sizes);
+
+        double[][] out = myModel.predict(inputs);
+
+        for (int i = 0; i < out.length; i++) {
+            System.out.println(Arrays.toString(out[i]));
+        }
 
     }
 }

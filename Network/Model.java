@@ -1,5 +1,7 @@
 package Network;
 
+import java.io.LineNumberInputStream;
+
 public class Model {
     int[] _sizes;
     Layer[] _layers;
@@ -20,9 +22,26 @@ public class Model {
         }
     }
 
-    // forward pass
-    public void call() {
-        // start with hidden layers
+    // forward pass is always one x[0]
+    // x[0] - y[o]
+    public double[] call(double[] input) {
+        double[] yCurr = input;
+        for (int i = 0; i < _layers.length; i++)
+            yCurr = _layers[i].call(yCurr);
+
+        return yCurr;
+    }
+
+    // all instances
+    // start with hidden layers
+    public double[][] predict(double[][] inputs) {
+        int lastLayerSize = _sizes[_sizes.length - 1];
+        double[][] Y = new double[inputs.length][lastLayerSize];
+        // first instance
+        for (int i = 0; i < inputs.length; i++) {
+            Y[i] = call(inputs[i]);
+        }
+        return Y;
     }
 
     public void fit(double[][] input, double[][] output) {
