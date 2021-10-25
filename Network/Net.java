@@ -49,6 +49,31 @@ public class Net {
         return newArray;
     }
 
+    // scalar multiplication of elements in two arrays
+    static double[][] multiplyScalar(double[][] a1, int value) {
+        // initialize output array
+        double[][] mulOutput = new double[a1.length][a1[0].length];
+
+        // multiplication
+        for (int i = 0; i < a1.length; i++) {
+            for (int j = 0; j < a1[0].length; j++) {
+                mulOutput[i][j] = a1[i][j] * value;
+            }
+        }
+        return mulOutput;
+    }
+
+    static double[] multiplyScalar(double[] a1, int value) {
+        // initialize output array
+        double[] mulOutput = new double[a1.length];
+
+        // multiplication
+        for (int i = 0; i < a1.length; i++) {
+            mulOutput[i] = a1[i] * value;
+        }
+        return mulOutput;
+    }
+
     // https://www.varsitytutors.com/hotmath/hotmath_help/topics/matrix-multiplication
     // dot product two arrays
     public static double[] dotProduct(double[][] weights, double[] input) {
@@ -85,6 +110,30 @@ public class Net {
             // adds the arrays together
             for (int i = 0; i < len; i++) {
                 arraySum[i] = a1[i] + a2[i];
+            }
+        } else {
+            System.out.println("Cannot add arrays");
+            System.exit(0);
+        }
+        return arraySum;
+    }
+
+    static double[][] addArrays(double[][] a1, double[][] a2) {
+        // get height and width of arrays
+        int height = a1.length;
+        int width = a1[0].length;
+
+        // init output array
+        double[][] arraySum = new double[height][width];
+
+        // if arrays are addable, add them
+        // otherwise return error message and exit
+        if ((a1.length == a2.length) && (a1[0].length == a2[0].length)) {
+            // adds the arrays together
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    arraySum[i][j] = a1[i][j] + a2[i][j];
+                }
             }
         } else {
             System.out.println("Cannot add arrays");
@@ -157,7 +206,7 @@ public class Net {
     public static void fit(int numEpochs, int learningRate, double[][][] weights, double[][] biases, double[][] inputs,
             double[][] yTrain) {
         int batchSize = 2;
-        int Xindex;
+        // int Xindex;
 
         // pending changes
         double[][][] weightsChanges = new double[weights.length][weights[0].length][weights[0][0].length];
@@ -168,7 +217,7 @@ public class Net {
 
         // loop until epochs are done
         for (int i = 0; i < numEpochs; i++) {
-            int numBatches = inputs.length / batchSize;
+            // int numBatches = inputs.length / batchSize;
             int lastLayerIndex = weightsChanges.length - 1;
             double[][] batchCurr = new double[batchSize][inputs[0].length];
             double[][] yTrainCurr = new double[batchSize][yTrain[0].length];
@@ -197,7 +246,7 @@ public class Net {
                     }
                 }
             }
-            double[] oldErrorTerms = errorTerms;
+            // double[] oldErrorTerms = errorTerms;
             // hidden layer weights and biases
             // Big X level
 

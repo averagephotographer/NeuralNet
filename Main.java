@@ -7,15 +7,10 @@ RNN that learns how to recognize handwritten digits from the MNIST databse
 */
 import java.io.*;
 import java.util.Scanner;
-import java.util.function.Predicate;
-
-import javax.management.monitor.StringMonitor;
-import javax.naming.spi.DirStateFactory.Result;
 
 import java.util.Arrays;
 
-import Network.Layer;
-import Network.Model;
+import Network.*;
 
 class Main {
     public static void main(String[] csv_file_name) throws FileNotFoundException {
@@ -60,11 +55,11 @@ class Main {
 
         // forward pass
 
-        Layer myLayer = new Layer(3, 4);
+        // Layer myLayer = new Layer(3, 4);
         // myLayer.printWeights();
-        System.out.println();
+        // System.out.println();
         // myLayer.printBiases();
-        System.out.println();
+        // System.out.println();
 
         int[] sizes = { 4, 3, 2 };
 
@@ -76,5 +71,14 @@ class Main {
             System.out.println(Arrays.toString(out[i]));
         }
 
+        Model excel = new Model(sizes, weights, biases);
+
+        System.out.println();
+        double[][] out2 = excel.predict(inputs);
+
+        for (int i = 0; i < out2.length; i++) {
+            System.out.println(Arrays.toString(out2[i]));
+        }
+        System.out.println();
     }
 }
