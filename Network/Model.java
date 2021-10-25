@@ -106,8 +106,6 @@ public class Model {
                                             * prevLayersHidden[j];
                                 }
                             }
-                            // save last layer error
-
                         } else {
                             // TODO: implement the other weight update rules (non last layers)
 
