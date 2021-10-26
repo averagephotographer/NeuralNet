@@ -38,9 +38,11 @@ class Main {
         double[] x22 = { 1, 1, 0, 0 };
         double[] y22 = { 1, 0 };
 
+        double[] xtra = { 1, 1, 1, 1 };
+        double[] ytra = { 0, 0 };
         // packing
-        double[][] inputs = { x1, x2, x21, x22 };
-        double[][] outputs = { y1, y2, y21, y22 };
+        double[][] inputs = { x1, x2, x21, x22, xtra };
+        double[][] outputs = { y1, y2, y21, y22, ytra };
         double[][][] weights = { weight1, weight2 };
         double[][] biases = { bias1, bias2 };
 
