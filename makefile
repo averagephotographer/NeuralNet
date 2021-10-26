@@ -5,11 +5,9 @@ JC = javac
 		$(JC) $(JFLAGS) $*.java
 
 CLASSES = \
-		background/A.java \
-		background/MiniBatch.java \
-		background/Network.java \
-		background/Array.java \
-		Net.java \
+		Network/Layer.java \
+		Network/Net.java \
+		Network/Model.java \
 		Main.java
 
 default: classes
