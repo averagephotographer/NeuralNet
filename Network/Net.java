@@ -50,7 +50,7 @@ public class Net {
     }
 
     // scalar multiplication of elements in two arrays
-    static double[][] multiplyScalar(double[][] a1, int value) {
+    static double[][] multiplyScalar(double[][] a1, double value) {
         // initialize output array
         double[][] mulOutput = new double[a1.length][a1[0].length];
 
@@ -63,7 +63,7 @@ public class Net {
         return mulOutput;
     }
 
-    static double[] multiplyScalar(double[] a1, int value) {
+    static double[] multiplyScalar(double[] a1, double value) {
         // initialize output array
         double[] mulOutput = new double[a1.length];
 
@@ -137,6 +137,30 @@ public class Net {
             }
         } else {
             System.out.println("Cannot add arrays");
+            System.exit(0);
+        }
+        return arraySum;
+    }
+
+    static double[][] subtractArrays(double[][] a1, double[][] a2) {
+        // get height and width of arrays
+        int height = a1.length;
+        int width = a1[0].length;
+
+        // init output array
+        double[][] arraySum = new double[height][width];
+
+        // if arrays can be subtracted
+        // otherwise return error message and exit
+        if ((a1.length == a2.length) && (a1[0].length == a2[0].length)) {
+            // adds the arrays together
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    arraySum[i][j] = a1[i][j] - a2[i][j];
+                }
+            }
+        } else {
+            System.out.println("Cannot subtract arrays");
             System.exit(0);
         }
         return arraySum;

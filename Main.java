@@ -63,22 +63,17 @@ class Main {
 
         int[] sizes = { 4, 3, 2 };
 
-        Model myModel = new Model(sizes);
+        // Model myModel = new Model(sizes);
 
-        double[][] out = myModel.predict(inputs);
+        // double[][] out = myModel.predict(inputs);
 
-        for (int i = 0; i < out.length; i++) {
-            System.out.println(Arrays.toString(out[i]));
-        }
+        // for (int i = 0; i < out.length; i++) {
+        // System.out.println(Arrays.toString(out[i]));
+        // }
 
         Model excel = new Model(sizes, weights, biases);
 
-        System.out.println();
-        double[][] out2 = excel.predict(inputs);
-
-        for (int i = 0; i < out2.length; i++) {
-            System.out.println(Arrays.toString(out2[i]));
-        }
-        System.out.println();
+        excel.fit(1, 2, 10, inputs, outputs);
+        excel.printModel(false);
     }
 }

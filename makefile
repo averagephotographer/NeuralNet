@@ -7,6 +7,7 @@ JC = javac
 CLASSES = \
 		Network/Layer.java \
 		Network/Net.java \
+		Network/Model.java \
 		Main.java
 
 default: classes

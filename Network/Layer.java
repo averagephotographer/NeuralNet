@@ -60,10 +60,35 @@ public class Layer {
     }
 
     public void flush(int batchSize) {
-        _weightChanges = Net.multiplyScalar(_weightChanges, 1 / batchSize);
-        _biasChanges = Net.multiplyScalar(_biasChanges, 1 / batchSize);
+        _weightChanges = Net.multiplyScalar(_weightChanges, 1 / Double.valueOf(batchSize));
+        _biasChanges = Net.multiplyScalar(_biasChanges, 1 / Double.valueOf(batchSize));
 
-        _weights = Net.addArrays(_weights, _weightChanges);
-        _biases = Net.addArrays(_biases, _biasChanges);
+        _weights = Net.subtractArrays(_weights, _weightChanges);
+        _biases = Net.subtractArrays(_biases, _biasChanges);
+
+        // reset changes to zero for the next loop
+        resetChanges();
+    }
+
+    public void resetChanges() {
+        _weightChanges = Net.multiplyScalar(_weightChanges, 0);
+        _biasChanges = Net.multiplyScalar(_biasChanges, 0);
+    }
+
+    public void printLayer(boolean printState) {
+        // print weights
+        System.out.println("Weights: ");
+        printWeights();
+
+        System.out.println("Biases: ");
+        printBiases();
+
+        // optional print state
+        if (printState == true) {
+            System.out.println("State: ");
+            System.out.println(Arrays.toString(_hidden));
+        }
+        System.out.println();
+
     }
 }
