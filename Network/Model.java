@@ -1,8 +1,5 @@
 package Network;
 
-import java.util.Arrays;
-import java.util.Currency;
-
 public class Model {
     int[] _sizes;
     Layer[] _layers;
@@ -38,7 +35,7 @@ public class Model {
     public double[] call(double[] xInput) {
         double[] yCurr = xInput;
         for (int i = 0; i < _layers.length; i++)
-            yCurr = _layers[i].call(yCurr);
+            yCurr = _layers[i].forwardPass(yCurr);
 
         return yCurr;
     }
@@ -119,7 +116,6 @@ public class Model {
                     }
                     // accumulate changes
                     for (int j = 0; j < errorTerms.length; j++) {
-                        // (aj - yj) * aj * (1-aj)
                         _layers[currLayerIndex]._biasChanges[j] += errorTerms[j] * lr;
 
                         for (int k = 0; k < _layers[currLayerIndex]._weightChanges[j].length; k++) {
@@ -133,9 +129,7 @@ public class Model {
                 // once batch are finished, flush
                 // if y is the last index, flush the unfinished batch
                 if (batchCounter == batchSize || y == bigY.length - 1) {
-                    // gathering pending changes
-
-                    // submitting pending changes
+                    // submitting pending changes in the batch
                     flush(batchCounter);
 
                     batchCounter = 0;

@@ -1,8 +1,5 @@
 package Network;
 
-import java.util.Arrays;
-import java.text.DecimalFormat;
-
 public class Layer {
     public double[][] _weights;
     public double[] _biases;
@@ -22,8 +19,8 @@ public class Layer {
     }
 
     // randomly create weights and biases
-    // m = num nodes
-    // d = dimensionality of last layer
+    // M = num nodes/neurons
+    // D = dimensionality of last layer (# of neurons last layer)
     public Layer(int M, int D) {
         // randomly init wb
         this._weights = Net.randomArray(M, D);
@@ -34,7 +31,8 @@ public class Layer {
         this._biasChanges = new double[M];
     }
 
-    public double[] call(double[] input) {
+    // one forward pass
+    public double[] forwardPass(double[] input) {
         double[] zValue = Net.addArrays(Net.dotProduct(this._weights, input), this._biases);
         _hidden = Net.sigmoid(zValue);
         return _hidden;
@@ -48,14 +46,16 @@ public class Layer {
         _biasChanges = Net.addArrays(_biasChanges, changes);
     }
 
+    // gets the next weights ready for the
     public void flush(int batchSize) {
+        // average the weights and biases over the batch size
         _weightChanges = Net.multiplyScalar(_weightChanges, 1 / Double.valueOf(batchSize));
         _biasChanges = Net.multiplyScalar(_biasChanges, 1 / Double.valueOf(batchSize));
 
         _weights = Net.subtractArrays(_weights, _weightChanges);
         _biases = Net.subtractArrays(_biases, _biasChanges);
 
-        // reset changes to zero for the next loop
+        // reset changes to zero
         resetChanges();
     }
 
@@ -65,7 +65,6 @@ public class Layer {
     }
 
     public void printLayer(boolean printState) {
-
         // print weights
         Net.print(_weights, "Weights");
         // print biases

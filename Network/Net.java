@@ -1,19 +1,23 @@
 package Network;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.text.DecimalFormat;
 
 public class Net {
+    public static DecimalFormat numberFormat = new DecimalFormat("0.00##");
+
+    public static void print(double[] arr, String name) {
+        // prints the height of an array
+        size(arr, name);
+        for (int i = 0; i < arr.length; i++) {
+            System.out.println(numberFormat.format(arr[i]) + "\t");
+        }
+        System.out.println();
+    }
+
     public static void print(double[][] arr, String name) {
-
-        DecimalFormat numberFormat = new DecimalFormat("0.00##");
-
         // prints the height x width of an array
-        System.out.println();
-        System.out.println("h x w: " + name);
-        System.out.println(arr.length + " x " + arr[0].length);
-        System.out.println();
+        size(arr, name);
 
         for (int i = 0; i < arr.length; i++) {
             for (int j = 0; j < arr[0].length; j++) {
@@ -24,21 +28,11 @@ public class Net {
         System.out.println();
     }
 
-    public static void print(double[] arr, String name) {
-
-        DecimalFormat numberFormat = new DecimalFormat("0.00##");
-
-        // prints the height x width of an array
+    public static void size(double[] arr, String name) {
         System.out.println();
-        System.out.println("h: " + name);
+        System.out.println("h:  " + name);
         System.out.println(arr.length);
         System.out.println();
-
-        for (int i = 0; i < arr.length; i++) {
-            System.out.println(numberFormat.format(arr[i]) + "\t");
-        }
-        System.out.println();
-
     }
 
     public static void size(double[][] arr, String name) {
@@ -48,7 +42,16 @@ public class Net {
         System.out.println();
     }
 
-    // for weights
+    public static double[] randomArray(int x) {
+        double[] randArray = new double[x];
+        Random r = new Random();
+
+        for (int i = 0; i < x; i++) {
+            randArray[i] = r.nextDouble();
+        }
+        return randArray;
+    }
+
     public static double[][] randomArray(int x, int y) {
         double[][] randArray = new double[x][y];
         Random r = new Random();
@@ -61,17 +64,6 @@ public class Net {
         return randArray;
     }
 
-    // for biases
-    public static double[] randomArray(int x) {
-        double[] randArray = new double[x];
-        Random r = new Random();
-
-        for (int i = 0; i < x; i++) {
-            randArray[i] = r.nextDouble();
-        }
-        return randArray;
-    }
-
     public static double[] onesArray(int length) {
         double[] onesArray = new double[length];
         for (int i = 0; i < length; i++) {
@@ -80,9 +72,7 @@ public class Net {
         return onesArray;
     }
 
-    // transposes a single array
     public static double[][] transpose(double[][] a1) {
-
         double[][] newArray = new double[a1[0].length][a1.length];
 
         for (int i = 0; i < a1[0].length; i++) {
@@ -93,7 +83,17 @@ public class Net {
         return newArray;
     }
 
-    // scalar multiplication of elements in two arrays
+    static double[] multiplyScalar(double[] a1, double value) {
+        // initialize output array
+        double[] mulOutput = new double[a1.length];
+
+        // multiplication
+        for (int i = 0; i < a1.length; i++) {
+            mulOutput[i] = a1[i] * value;
+        }
+        return mulOutput;
+    }
+
     static double[][] multiplyScalar(double[][] a1, double value) {
         // initialize output array
         double[][] mulOutput = new double[a1.length][a1[0].length];
@@ -103,17 +103,6 @@ public class Net {
             for (int j = 0; j < a1[0].length; j++) {
                 mulOutput[i][j] = a1[i][j] * value;
             }
-        }
-        return mulOutput;
-    }
-
-    static double[] multiplyScalar(double[] a1, double value) {
-        // initialize output array
-        double[] mulOutput = new double[a1.length];
-
-        // multiplication
-        for (int i = 0; i < a1.length; i++) {
-            mulOutput[i] = a1[i] * value;
         }
         return mulOutput;
     }
@@ -129,20 +118,16 @@ public class Net {
             System.exit(0);
         }
 
-        // dotprod operation
+        // dot prod operation
         for (int i = 0; i < weights.length; i++) {
             for (int j = 0; j < input.length; j++) {
                 product[i] += weights[i][j] * input[j];
             }
         }
         return product;
-
     }
 
-    // only used with single dimension vectors
-    // array addition, assumes arrays are are perfect rectangles
     public static double[] addArrays(double[] a1, double[] a2) {
-        // get height and width of arrays
         int len = a1.length;
 
         // init output array
@@ -186,6 +171,28 @@ public class Net {
         return arraySum;
     }
 
+    // subtract arrays
+    public static double[] subtractArrays(double[] a1, double[] a2) {
+        // get height and width of arrays
+        int len = a1.length;
+
+        // init output array
+        double[] arrayDiff = new double[len];
+
+        // if arrays are able to, subtract them
+        // otherwise return error message and exit
+        if (a1.length == a2.length) {
+            // adds the arrays together
+            for (int i = 0; i < len; i++) {
+                arrayDiff[i] = a1[i] - a2[i];
+            }
+        } else {
+            System.out.println("Cannot subtract arrays");
+            System.exit(0);
+        }
+        return arrayDiff;
+    }
+
     static double[][] subtractArrays(double[][] a1, double[][] a2) {
         // get height and width of arrays
         int height = a1.length;
@@ -210,28 +217,6 @@ public class Net {
         return arraySum;
     }
 
-    // subtract arrays
-    public static double[] subtractArrays(double[] a1, double[] a2) {
-        // get height and width of arrays
-        int len = a1.length;
-
-        // init output array
-        double[] arrayDiff = new double[len];
-
-        // if arrays are able to, subtract them
-        // otherwise return error message and exit
-        if (a1.length == a2.length) {
-            // adds the arrays together
-            for (int i = 0; i < len; i++) {
-                arrayDiff[i] = a1[i] - a2[i];
-            }
-        } else {
-            System.out.println("Cannot subtract arrays");
-            System.exit(0);
-        }
-        return arrayDiff;
-    }
-
     public static double[] sigmoid(double[] zValue) {
         double[] sigmoidOut = new double[zValue.length];
         for (int i = 0; i < zValue.length; i++) {
@@ -240,80 +225,4 @@ public class Net {
         return sigmoidOut;
     }
 
-    // this is a forward pass, predict is what it's called in tf
-    // this input could be a Model class object
-    // include all weights, all biases
-    // include all training data as the input
-    public static double[][] predict(double[][][] weights, double[][] biases, double[][] inputs) {
-        int lastBiasLength = biases[biases.length - 1].length;
-
-        // initialize final output array
-        // inputs.length is how many inputs we have
-        // lastBiasLength is how many nodes are in the output (10 for mnist)
-        double[][] Y = new double[inputs.length][lastBiasLength];
-
-        // could also use weights.lenth could also be here
-        int numLayers = biases.length;
-
-        // loop over all inputs
-        for (int i = 0; i < inputs.length; i++) {
-            double[] currentInput = inputs[i];
-
-            // loop over desired length of layers
-            for (int j = 0; j < numLayers; j++) {
-                double[] zValue = addArrays(dotProduct(weights[j], currentInput), biases[j]);
-                currentInput = sigmoid(zValue);
-            }
-            Y[i] = currentInput;
-        }
-        return Y;
-    }
-
-    // call - one forward pass
-
-    public static void fit(int numEpochs, int learningRate, double[][][] weights, double[][] biases, double[][] inputs,
-            double[][] yTrain) {
-        int batchSize = 2;
-        // int Xindex;
-
-        // pending changes
-        double[][][] weightsChanges = new double[weights.length][weights[0].length][weights[0][0].length];
-        double[][] biasesChanges = new double[biases.length][biases[0].length];
-
-        double[][][] weightsCurrent = weights;
-        double[][] biasesCurrent = biases;
-
-        // loop until epochs are done
-        for (int i = 0; i < numEpochs; i++) {
-            // int numBatches = inputs.length / batchSize;
-            int lastLayerIndex = weightsChanges.length - 1;
-            double[][] batchCurr = new double[batchSize][inputs[0].length];
-            double[][] yTrainCurr = new double[batchSize][yTrain[0].length];
-
-            int batchCounter = 0;
-            batchCurr = Arrays.copyOfRange(inputs, batchCounter, batchCounter + batchSize);
-            yTrainCurr = Arrays.copyOfRange(yTrain, batchCounter, batchCounter + batchSize);
-
-            /// predict on batchSize
-            double[][] yCurr = predict(weightsCurrent, biasesCurrent, batchCurr);
-            batchCounter += batchSize;
-
-            double[] errorTerms = new double[weightsCurrent[lastLayerIndex].length];
-
-            // last layer weights and biases
-            // Big X level
-            for (int j = 0; j < batchCurr.length; j++) {
-                // X[instance] level
-                for (int u = 0; u < weightsCurrent[lastLayerIndex].length; u++) {
-                    // neuron level (everyone shares layer term)
-                    errorTerms[u] = yCurr[j][u] * (1 - yCurr[j][u]) * (yTrainCurr[j][u] - yCurr[j][u]);
-                    biasesChanges[lastLayerIndex][u] += (learningRate * errorTerms[u]);
-                    for (int v = 0; v < weightsCurrent[lastLayerIndex][0].length; v++) {
-                        // node level (aka weights level of a particular neuron)
-                        weightsChanges[lastLayerIndex][u][v] += (learningRate * errorTerms[u] * batchCurr[j][v]);
-                    }
-                }
-            }
-        }
-    }
 }
