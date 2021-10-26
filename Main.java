@@ -41,27 +41,12 @@ class Main {
         double[] xtra = { 1, 1, 1, 1 };
         double[] ytra = { 0, 0 };
         // packing
-        double[][] inputs = { x1, x2, x21, x22, xtra };
-        double[][] outputs = { y1, y2, y21, y22, ytra };
+        double[][] bigX = { x1, x2, x21, x22 };
+        double[][] bigY = { y1, y2, y21, y22 };
         double[][][] weights = { weight1, weight2 };
         double[][] biases = { bias1, bias2 };
 
         /////////////////////////////////////////////////////////
-        // Arrays.toString() to print arrays
-
-        // h is a in O'Neal's program
-        // double[] h = sigmoid(addArrays(dotProduct(weights[0], inputs[0]),
-        // biases[0]));
-
-        // System.out.println(Arrays.toString(h));
-
-        // forward pass
-
-        // Layer myLayer = new Layer(3, 4);
-        // myLayer.printWeights();
-        // System.out.println();
-        // myLayer.printBiases();
-        // System.out.println();
 
         int[] sizes = { 4, 3, 2 };
 
@@ -73,9 +58,10 @@ class Main {
         // System.out.println(Arrays.toString(out[i]));
         // }
 
-        Model excel = new Model(sizes, weights, biases);
+        // Model excel = new Model(sizes, weights, biases);
+        Model excel = new Model(sizes);
 
-        excel.fit(1, 2, 10, inputs, outputs);
+        excel.fit(1, 2, 10, bigX, bigY);
         excel.printModel(false);
     }
 }

@@ -2,8 +2,52 @@ package Network;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.text.DecimalFormat;
 
 public class Net {
+    public static void print(double[][] arr, String name) {
+
+        DecimalFormat numberFormat = new DecimalFormat("0.00##");
+
+        // prints the height x width of an array
+        System.out.println();
+        System.out.println("h x w: " + name);
+        System.out.println(arr.length + " x " + arr[0].length);
+        System.out.println();
+
+        for (int i = 0; i < arr.length; i++) {
+            for (int j = 0; j < arr[0].length; j++) {
+                System.out.print(numberFormat.format(arr[i][j]) + "\t");
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+
+    public static void print(double[] arr, String name) {
+
+        DecimalFormat numberFormat = new DecimalFormat("0.00##");
+
+        // prints the height x width of an array
+        System.out.println();
+        System.out.println("h: " + name);
+        System.out.println(arr.length);
+        System.out.println();
+
+        for (int i = 0; i < arr.length; i++) {
+            System.out.println(numberFormat.format(arr[i]) + "\t");
+        }
+        System.out.println();
+
+    }
+
+    public static void size(double[][] arr, String name) {
+        System.out.println();
+        System.out.println("h x w: " + name);
+        System.out.println(arr.length + " x " + arr[1].length);
+        System.out.println();
+    }
+
     // for weights
     public static double[][] randomArray(int x, int y) {
         double[][] randArray = new double[x][y];
@@ -270,32 +314,6 @@ public class Net {
                     }
                 }
             }
-            // double[] oldErrorTerms = errorTerms;
-            // hidden layer weights and biases
-            // Big X level
-
-            // ADD EXTRA LOOP TO UPDATE CURRENT LAYER AND ITERATE OVER REMAINING LAYERS
-            // for (int j = 0; j < batchCurr.length; j++) {
-            // // X[instance] level
-            // for (int u = 0; u < weightsCurrent[lastLayerIndex].length; u++) {
-            // // neuron level (everyone shares layer term)
-            // double extraSum;
-            // for (int z = 0; z < errorTerms.length; z++) {
-            // extraSum += weightsCurrent[currentLayer][z][u] * oldErrorTerms[z];
-            // }
-            // errorTerms[u] = yCurr[j][u] * (1 - yCurr[j][u]) * extraSum;
-            // biasesChanges[lastLayerIndex][u] += (learningRate * errorTerms[u]);
-            // for (int v = 0; v < weightsCurrent[lastLayerIndex][0].length; v++) {
-            // // node level (aka weights level of a particular neuron)
-            // weightsChanges[lastLayerIndex][u][v] += (learningRate * errorTerms[u] *
-            // batchCurr[j][v]);
-            // }
-            // }
-            // }
-            /// Find gradient using J
-
-            /// update
-
         }
     }
 }

@@ -1,6 +1,7 @@
 package Network;
 
 import java.util.Arrays;
+import java.text.DecimalFormat;
 
 public class Layer {
     public double[][] _weights;
@@ -31,18 +32,6 @@ public class Layer {
 
         this._weightChanges = new double[M][D];
         this._biasChanges = new double[M];
-    }
-
-    public void printWeights() {
-        for (int i = 0; i < _weights.length; i++) {
-            System.out.println(Arrays.toString(_weights[i]));
-            System.out.println();
-        }
-    }
-
-    public void printBiases() {
-        System.out.println(Arrays.toString(_biases));
-        System.out.println();
     }
 
     public double[] call(double[] input) {
@@ -76,17 +65,15 @@ public class Layer {
     }
 
     public void printLayer(boolean printState) {
-        // print weights
-        System.out.println("Weights: ");
-        printWeights();
 
-        System.out.println("Biases: ");
-        printBiases();
+        // print weights
+        Net.print(_weights, "Weights");
+        // print biases
+        Net.print(_biases, "biases");
 
         // optional print state
         if (printState == true) {
-            System.out.println("State: ");
-            System.out.println(Arrays.toString(_hidden));
+            Net.print(_hidden, "hidden");
         }
         System.out.println();
 

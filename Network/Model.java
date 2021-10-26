@@ -19,7 +19,6 @@ public class Model {
             int D = _sizes[i];
 
             _layers[i] = new Layer(M, D);
-            _layers[i].printWeights();
         }
     }
 
@@ -64,7 +63,7 @@ public class Model {
     }
 
     // yTrain is the ground truth, everything included
-    public void fit(int epochs, int batchSize, double lr, double[][] Xtrain, double[][] Ytrain) {
+    public void fit(int epochs, int batchSize, double lr, double[][] bigX, double[][] bigY) {
 
         // for every epoch, loop through the entire training dataset
         for (int i = 0; i < epochs; i++) {
@@ -73,15 +72,15 @@ public class Model {
             int batchCounter = 0;
 
             // for every item in the training data
-            for (int y = 0; y < Ytrain.length; y++) {
+            for (int y = 0; y < bigY.length; y++) {
 
                 batchCounter++;
 
                 // forward pass
-                double[] yHat = call(Xtrain[y]);
+                double[] yHat = call(bigX[y]);
 
                 // ground truth instance from big Y
-                double[] Ysingle = Ytrain[y];
+                double[] Ysingle = bigY[y];
 
                 // last layer terms l+1
                 // initialized to a len of 1 because it will be overridden by the last layer
@@ -89,19 +88,19 @@ public class Model {
 
                 // start with last layer and move left
                 for (int currLayerIndex = _layers.length - 1; currLayerIndex >= 0; currLayerIndex--) {
-                    // error term for weights and bias
+                    // each node's error term
                     double[] errorTerms = new double[_layers[currLayerIndex]._hidden.length];
 
                     double[] leftLayersHidden;
                     // the 0th layer is the input layer
                     // not included in _layers because it's fake
                     if (currLayerIndex == 0) {
-                        leftLayersHidden = Xtrain[y];
+                        leftLayersHidden = bigX[y];
                     } else {
                         leftLayersHidden = _layers[currLayerIndex - 1]._hidden;
                     }
 
-                    // if current layer is the last layer do special math
+                    // calculate error terms
                     if (currLayerIndex == _layers.length - 1) {
                         // calculate error term for the last layer
                         for (int j = 0; j < errorTerms.length; j++) {
@@ -128,12 +127,12 @@ public class Model {
                         }
                     }
 
-                    // saves last layer error terms for future use
+                    // saves right layer error terms for future use
                     errorRightLayer = errorTerms;
                 }
                 // once batch are finished, flush
                 // if y is the last index, flush the unfinished batch
-                if (batchCounter == batchSize || y == Ytrain.length - 1) {
+                if (batchCounter == batchSize || y == bigY.length - 1) {
                     // gathering pending changes
 
                     // submitting pending changes
