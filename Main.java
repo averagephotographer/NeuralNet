@@ -66,15 +66,15 @@ class Main {
 
         String test = "data/mnist_test.csv";
         String train = "data/mnist_train.csv";
-
+        int length = 60000;
         // read from csv
-        double[][] raw = csvReader(test);
+        double[][] raw = csvReader(train, length);
 
         // initializing arrays
         /// image data
-        double[][] X = new double[10000][784];
+        double[][] X = new double[length][784];
         /// image classification
-        double[][] Y = new double[10000][10];
+        double[][] Y = new double[length][10];
 
         for (int i = 0; i < X.length; i++) {
             int index = (int) Math.round(raw[i][0]);
@@ -93,14 +93,14 @@ class Main {
 
         // variables
         int[] sizes = { 784, 100, 10 };
-        int epochs = 6;
+        int epochs = 30;
         int BatchSize = 10;
         int LearningRate = 3;
 
         Model mnist = new Model(sizes);
         mnist.fit(epochs, BatchSize, LearningRate, X, Y);
 
-        // saveModel("bestmodel.model", mnist);
+        saveModel("bestmodel.model", mnist);
 
         // Model mnist = loadModel("bestmodel.model");
         // mnist.predict(X);
@@ -151,9 +151,9 @@ class Main {
     }
 
     // https://www.javatpoint.com/how-to-read-csv-file-in-java
-    static double[][] csvReader(String fileName) throws FileNotFoundException {
+    static double[][] csvReader(String fileName, int length) throws FileNotFoundException {
         // pulls csv into java, prints it
-        double[][] raw = new double[10000][785];
+        double[][] raw = new double[length][785];
         Scanner csv = new Scanner(new File(fileName));
 
         csv.useDelimiter(",|\r|\n");

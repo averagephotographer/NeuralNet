@@ -58,7 +58,8 @@ public class Net {
 
         for (int i = 0; i < x; i++) {
             for (int j = 0; j < y; j++) {
-                randArray[i][j] = r.nextDouble();
+                // random double between -1 and 1
+                randArray[i][j] = r.nextDouble() * (r.nextBoolean() ? 1 : -1);
             }
         }
         return randArray;

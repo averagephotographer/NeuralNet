@@ -175,9 +175,10 @@ public class Model implements Serializable {
         for (int i = 0; i < _correct.length; i++) {
             System.out.print(i + " = " + _correct[i] + "/" + (_correct[i] + _incorrect[i]) + "  ");
             correctSum += _correct[i];
-            totalSum += correctSum + _incorrect[i];
+            totalSum += _correct[i] + _incorrect[i];
         }
-        System.out.print("Accuracy = " + correctSum + "/" + totalSum + " = " + (correctSum / totalSum) + "%");
+        double percent = ((100.0 * correctSum) / totalSum);
+        System.out.print("Accuracy = " + percent + "%");
         System.out.println();
         System.out.println();
         _correct = new int[_sizes[_sizes.length - 1]];
