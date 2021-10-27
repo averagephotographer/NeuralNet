@@ -1,6 +1,8 @@
 package Network;
 
-public class Layer {
+import java.io.Serializable;
+
+public class Layer implements Serializable {
     public double[][] _weights;
     public double[] _biases;
     public double[] _hidden;
@@ -32,8 +34,8 @@ public class Layer {
     }
 
     // one forward pass
-    public double[] forwardPass(double[] input) {
-        double[] zValue = Net.addArrays(Net.dotProduct(this._weights, input), this._biases);
+    public double[] forwardPass(double[] xInput) {
+        double[] zValue = Net.addArrays(Net.dotProduct(this._weights, xInput), this._biases);
         _hidden = Net.sigmoid(zValue);
         return _hidden;
     }

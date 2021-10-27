@@ -7,12 +7,20 @@ RNN that learns how to recognize handwritten digits from the MNIST databse
 */
 import java.io.*;
 import java.util.Scanner;
-
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import Network.*;
 
 class Main {
 
     public static void main(String[] csv_file_name) throws FileNotFoundException {
+        // todo: get user input
+
         boolean practice = false;
 
         if (practice == true) {
@@ -58,46 +66,103 @@ class Main {
 
         String test = "data/mnist_test.csv";
         String train = "data/mnist_train.csv";
-        double[][] rawCSV = csvReader(test);
-        // desired output array
-        double[][] desiredOutput = new double[10000][10];
 
-        // separates the starting number from the data
-        double[][] numberData = new double[10000][784];
+        // read from csv
+        double[][] raw = csvReader(test);
 
-        for (int i = 0; i < numberData.length; i++) {
-            for (int j = 0; j < (numberData[0].length); j++) {
-                // just the image data
-                numberData[i][j] = rawCSV[i][j + 1];
+        // initializing arrays
+        /// image data
+        double[][] X = new double[10000][784];
+        /// image classification
+        double[][] Y = new double[10000][10];
+
+        for (int i = 0; i < X.length; i++) {
+            int index = (int) Math.round(raw[i][0]);
+            // image label
+            Y[i][index] = 1;
+
+            for (int j = 0; j < (X[0].length); j++) {
+                // image data
+                X[i][j] = raw[i][j + 1] / 255;
             }
-            int value = (int) Math.round(rawCSV[i][0]);
-
-            // sets the value at the position i to 1
-            desiredOutput[i][value] = 1.0;
         }
 
-        Net.size(desiredOutput, "desiredoutput");
+        // Net.size(X, "number data");
+        // Net.size(Y, "classification");
+        // printNum(X[9998], Y[9998]);
 
-        int[] sizes = { 784, 30, 10 };
-        int epochs = 1;
+        // variables
+        int[] sizes = { 784, 100, 10 };
+        int epochs = 6;
         int BatchSize = 10;
         int LearningRate = 3;
+
         Model mnist = new Model(sizes);
-        // mnist.fit(epochs, BatchSize, LearningRate, numberData, desiredOutput);
+        mnist.fit(epochs, BatchSize, LearningRate, X, Y);
+
+        // saveModel("bestmodel.model", mnist);
+
+        // Model mnist = loadModel("bestmodel.model");
+        // mnist.predict(X);
+    }
+
+    // https://mkyong.com/java/how-to-read-and-write-java-object-to-a-file/
+    static void saveModel(String fileName, Model model) {
+        try {
+            FileOutputStream f = new FileOutputStream(new File(fileName));
+            ObjectOutputStream o = new ObjectOutputStream(f);
+
+            // write objects to file
+            o.writeObject(model);
+
+            o.close();
+            f.close();
+        } catch (FileNotFoundException e) {
+            System.out.println(e);
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+    }
+
+    static Model loadModel(String fileName) {
+        int[] sizes = { 1, 1, 1 };
+        Model empty = new Model(sizes);
+        try {
+            FileInputStream fi = new FileInputStream(new File(fileName));
+            ObjectInputStream oi = new ObjectInputStream(fi);
+
+            // Read objects
+            Model model = (Model) oi.readObject();
+
+            oi.close();
+            fi.close();
+
+            return model;
+
+        } catch (FileNotFoundException e) {
+            System.out.println(e);
+        } catch (IOException e) {
+            System.out.println(e);
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return empty;
     }
 
     // https://www.javatpoint.com/how-to-read-csv-file-in-java
     static double[][] csvReader(String fileName) throws FileNotFoundException {
         // pulls csv into java, prints it
-        // filename: mnist_test.csv
-        double[][] rawData = new double[60000][785];
-        Scanner csvData = new Scanner(new File(fileName));
-        csvData.useDelimiter(",|\r|\n");
+        double[][] raw = new double[10000][785];
+        Scanner csv = new Scanner(new File(fileName));
+
+        csv.useDelimiter(",|\r|\n");
         int x = 0;
         int y = 0;
-        while (csvData.hasNext()) {
-            String s = csvData.next();
-            rawData[x][y] = Double.parseDouble(s) / 255;
+        while (csv.hasNext()) {
+            String s = csv.next();
+            // converts from string to double
+            raw[x][y] = Double.parseDouble(s);
             y++;
             if (y == 785) {
                 y = 0;
@@ -105,9 +170,57 @@ class Main {
             }
         }
 
-        csvData.close();
-        return rawData;
+        csv.close();
+        return raw;
+    }
 
+    public static void printNum(double[] number, double[] valueArr) {
+        int value = 0;
+        int counter = 0;
+
+        // get classification
+        for (int v = 0; v < valueArr.length; v++) {
+            if (valueArr[v] == 1.0) {
+                value = v;
+                System.out.println("value: " + value);
+            }
+        }
+
+        // print ascii
+        System.out.println("number: " + value);
+        for (int i = 1; i < 784; i++) {
+            System.out.print(" " + ascii(number[i]));
+            counter++;
+            if (counter > 27) {
+                System.out.println();
+                counter = 0;
+            }
+        }
+    }
+
+    static char ascii(double value) {
+        int rounded = (int) Math.round((value * 255) / 32);
+        switch (rounded) {
+        case 0:
+            return ' ';
+        case 1:
+            return '.';
+        case 2:
+            return ':';
+        case 3:
+            return ';';
+        case 4:
+            return 'i';
+        case 5:
+            return 'I';
+        case 6:
+            return 'T';
+        case 7:
+            return 'H';
+        case 8:
+            return '#';
+        }
+        return ' ';
     }
 
 }
