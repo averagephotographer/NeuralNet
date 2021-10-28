@@ -1,6 +1,7 @@
 package Network;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 
 public class Model implements Serializable {
     int[] _sizes;
@@ -74,7 +75,7 @@ public class Model implements Serializable {
         for (int i = 0; i < epochs; i++) {
             System.out.println("**** Epoch " + (i + 1) + " ****");
 
-            // initializes to zero
+            // initializes bc to zero
             int batchCounter = 0;
 
             // for every item in the training data
@@ -153,23 +154,28 @@ public class Model implements Serializable {
                     batchCounter = 0;
                 }
             }
-
-            // test the model, save the outputs
-            double[][] prediction = predict(bigX);
-            for (int p = 0; p < bigY.length; p++) {
-                int actual = largest(bigY[p]);
-                int predicted = largest(prediction[p]);
-                if (actual == predicted) {
-                    _correct[actual]++;
-                } else {
-                    _incorrect[actual]++;
-                }
-            }
+            countCorrect(bigX, bigY);
             printIntermediate();
         }
     }
 
+    public void countCorrect(double[][] bigX, double[][] bigY) {
+        // test the model, save the outputs
+        double[][] prediction = predict(bigX);
+        for (int p = 0; p < bigY.length; p++) {
+            int actual = largest(bigY[p]);
+            int predicted = largest(prediction[p]);
+            if (actual == predicted) {
+                _correct[actual]++;
+            } else {
+                _incorrect[actual]++;
+            }
+        }
+    }
+
     public void printIntermediate() {
+        DecimalFormat numberFormat = new DecimalFormat("0.##");
+
         int correctSum = 0;
         int totalSum = 0;
         for (int i = 0; i < _correct.length; i++) {
@@ -178,7 +184,8 @@ public class Model implements Serializable {
             totalSum += _correct[i] + _incorrect[i];
         }
         double percent = ((100.0 * correctSum) / totalSum);
-        System.out.print("Accuracy = " + percent + "%");
+
+        System.out.print("Accuracy = " + numberFormat.format(percent) + "%");
         System.out.println();
         System.out.println();
         _correct = new int[_sizes[_sizes.length - 1]];

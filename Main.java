@@ -19,7 +19,6 @@ import Network.*;
 class Main {
 
     public static void main(String[] csv_file_name) throws FileNotFoundException {
-        // todo: get user input
 
         boolean practice = false;
 
@@ -64,46 +63,154 @@ class Main {
         }
         /////////////////////////////////////////////////////////
 
-        String test = "data/mnist_test.csv";
-        String train = "data/mnist_train.csv";
-        int length = 60000;
-        // read from csv
-        double[][] raw = csvReader(train, length);
+        // print options here
+        // 0 - exit
+        // 1 - train the network
+        /// ask to make sure you want to train
+        // 2 - load pre-trained network
+        // 3 - accuracy on TRAINING data
+        // 4 - accuracy on TESTING data
+        // 5 - save network state to file
 
-        // initializing arrays
-        /// image data
-        double[][] X = new double[length][784];
-        /// image classification
-        double[][] Y = new double[length][10];
+        // todo: get user input
+        Scanner input = new Scanner(System.in);
+        // next token
 
-        for (int i = 0; i < X.length; i++) {
-            int index = (int) Math.round(raw[i][0]);
-            // image label
-            Y[i][index] = 1;
+        // Initialize shared variables
+        int length = 0;
+        int[] testSizes = { 1, 1, 1 };
+        Model model = new Model(testSizes);
+        String file = "none";
+        String name = ".model";
+        double[][] raw = new double[1][1];
+        double[][] X = new double[1][1];
+        double[][] Y = new double[1][1];
 
-            for (int j = 0; j < (X[0].length); j++) {
-                // image data
-                X[i][j] = raw[i][j + 1] / 255;
+        while (true) {
+            System.out.println("1 - Train the network");
+            System.out.println("2 - load pre-trained network");
+            System.out.println("3 - accuracy on TRAINING data");
+            System.out.println("4 - accuracy on TESTING data");
+            System.out.println("5 - save network state to file");
+            System.out.println("6 - print misclassified images");
+            System.out.println("0 - exit");
+
+            int option = input.nextInt();
+
+            switch (option) {
+            case 0:
+                // exit
+                System.out.println("Bye!");
+                input.close();
+                System.exit(0);
+                break;
+
+            case 1:
+                // train the network
+
+                file = "data/mnist_train.csv";
+                length = 60000;
+
+                // read from csv
+                System.out.println("Reading data...");
+                raw = csvReader(file, length);
+
+                // initializing arrays
+                /// image data
+                X = new double[length][784];
+                /// image classification
+                Y = new double[length][10];
+
+                for (int i = 0; i < X.length; i++) {
+                    int index = (int) Math.round(raw[i][0]);
+                    // image label
+                    Y[i][index] = 1;
+
+                    for (int j = 0; j < (X[0].length); j++) {
+                        // image data
+                        X[i][j] = raw[i][j + 1] / 255;
+                    }
+                }
+                // todo: randomize entire set
+
+                // model parameters
+                // should be 100 hidden layers, 30 epochs
+                int[] sizes = { 784, 100, 10 };
+                int epochs = 5;
+                int BatchSize = 10;
+                int LearningRate = 3;
+
+                model = new Model(sizes);
+                model.fit(epochs, BatchSize, LearningRate, X, Y);
+                break;
+
+            case 2:
+                // load pre-trained network
+                System.out.print("Name of the model: ");
+                name = input.nextLine();
+                name = input.nextLine();
+                model = loadModel(name + ".model");
+                break;
+
+            case 3:
+                // accuracy on training data
+                file = "data/mnist_train.csv";
+                length = 60000;
+                System.out.println("Reading data...");
+                raw = csvReader(file, length); // read from csv
+                X = new double[length][784]; // image data
+                Y = new double[length][10]; // image classification
+
+                for (int i = 0; i < X.length; i++) {
+                    int index = (int) Math.round(raw[i][0]);
+                    // image label
+                    Y[i][index] = 1;
+
+                    for (int j = 0; j < (X[0].length); j++) {
+                        // image data
+                        X[i][j] = raw[i][j + 1] / 255;
+                    }
+                }
+                model.countCorrect(X, Y);
+                model.printIntermediate();
+                break;
+
+            case 4:
+                // Accuracy on testing data
+                file = "data/mnist_test.csv";
+                length = 10000;
+
+                raw = csvReader(file, length); // raw csv
+                X = new double[length][784]; // image data
+                Y = new double[length][10]; // classification
+
+                for (int i = 0; i < X.length; i++) {
+                    int index = (int) Math.round(raw[i][0]);
+                    // image label
+                    Y[i][index] = 1;
+
+                    for (int j = 0; j < (X[0].length); j++) {
+                        // image data
+                        X[i][j] = raw[i][j + 1] / 255;
+                    }
+                }
+                model.countCorrect(X, Y);
+                model.printIntermediate();
+                break;
+
+            case 5:
+                // Save Model
+                System.out.print("Name the mode: ");
+                String save = input.nextLine();
+                save = "" + input.nextLine() + ".model";
+                saveModel(save, model);
+                break;
+            case 6:
+                // ascii print data
+                break;
             }
         }
 
-        // Net.size(X, "number data");
-        // Net.size(Y, "classification");
-        // printNum(X[9998], Y[9998]);
-
-        // variables
-        int[] sizes = { 784, 100, 10 };
-        int epochs = 30;
-        int BatchSize = 10;
-        int LearningRate = 3;
-
-        Model mnist = new Model(sizes);
-        mnist.fit(epochs, BatchSize, LearningRate, X, Y);
-
-        saveModel("bestmodel.model", mnist);
-
-        // Model mnist = loadModel("bestmodel.model");
-        // mnist.predict(X);
     }
 
     // https://mkyong.com/java/how-to-read-and-write-java-object-to-a-file/
@@ -144,7 +251,6 @@ class Main {
         } catch (IOException e) {
             System.out.println(e);
         } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return empty;
