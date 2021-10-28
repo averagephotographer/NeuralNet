@@ -89,14 +89,6 @@ public class Model implements Serializable {
                 // ground truth (bygY) for this instance
                 double[] Ysingle = bigY[y];
 
-                int answer = 0;
-                for (int ans = 0; ans < Ysingle.length; ans++) {
-                    if (Ysingle[ans] == 1.0) {
-                        answer = ans;
-                        break;
-                    }
-                }
-
                 // last layer terms l+1
                 // initialized to a len of 1 because it will be overridden by the last layer
                 double[] errorRightLayer = new double[1];
