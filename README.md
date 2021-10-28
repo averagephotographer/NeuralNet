@@ -1,4 +1,4 @@
-Homemade MNIST neural network written in Java. For Dr. Dub's AI class
+Homemade MNIST neural network written in Java for Dr. Dub's AI class
 
 
 ### note: training and testing data is assumed to be stored like this:
