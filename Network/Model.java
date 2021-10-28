@@ -27,8 +27,8 @@ public class Model implements Serializable {
     }
 
     public Model(int[] sizes, double[][][] weights, double[][] biases) {
-        // do your stuff
         _sizes = sizes;
+        // minus 1 because of the fake layer (already given)
         _layers = new Layer[sizes.length - 1];
         _correct = new int[sizes[sizes.length - 1]];
         _incorrect = new int[sizes[sizes.length - 1]];
@@ -39,8 +39,7 @@ public class Model implements Serializable {
         }
     }
 
-    // forward pass is always one x[0]
-    // x[0] - y[o]
+    // forward pass through all the layers
     public double[] call(double[] xInput) {
         double[] yCurr = xInput;
         for (int i = 0; i < _layers.length; i++)
@@ -61,7 +60,8 @@ public class Model implements Serializable {
         return Y;
     }
 
-    // loop through each layer and updating the weights and biases
+    // loop through each layer in the batch
+    // updates the weights and biases all at once
     public void flush(int batchSize) {
         for (int i = 0; i < _layers.length; i++) {
             _layers[i].flush(batchSize);
@@ -103,10 +103,10 @@ public class Model implements Serializable {
 
                 // start with last layer and move left
                 for (int currLayerIndex = _layers.length - 1; currLayerIndex >= 0; currLayerIndex--) {
-                    // each node's error term
+                    // initialize each node's error term
                     double[] errorTerms = new double[_layers[currLayerIndex]._hidden.length];
-
                     double[] leftLayersHidden;
+
                     // the 0th layer is the input layer
                     // not included in _layers because it's fake
                     if (currLayerIndex == 0) {
@@ -117,12 +117,16 @@ public class Model implements Serializable {
 
                     // calculate error terms
                     if (currLayerIndex == _layers.length - 1) {
-                        // calculate error term for the last layer
+                        // calculate error term for the right-most layer
                         for (int j = 0; j < errorTerms.length; j++) {
+
                             // (aj - yj) * aj * (1-aj)
+                            // calculated for each node in weights and biases
                             errorTerms[j] = (yHat[j] - Ysingle[j]) * yHat[j] * (1 - yHat[j]);
                         }
                     } else {
+                        // error for l-1 layers
+                        // won't reach here until after the right-most layer has been calculated
                         for (int k = 0; k < errorTerms.length; k++) {
                             double sum = 0;
                             for (int j = 0; j < errorRightLayer.length; j++) {
@@ -135,18 +139,20 @@ public class Model implements Serializable {
 
                     // accumulate changes
                     for (int j = 0; j < errorTerms.length; j++) {
+                        // add to the biasChanges for the batch
                         _layers[currLayerIndex]._biasChanges[j] += errorTerms[j] * lr;
 
                         for (int k = 0; k < _layers[currLayerIndex]._weightChanges[j].length; k++) {
+                            // add to the weightChanges for the batch
                             _layers[currLayerIndex]._weightChanges[j][k] += errorTerms[j] * lr * leftLayersHidden[k];
                         }
                     }
 
-                    // saves right layer error terms for future use
+                    // saves right layer error terms for next loop
                     errorRightLayer = errorTerms;
                 }
 
-                // once batch are finished, flush
+                // once batch are finished, flush w&b for the next batch
                 // if y is the last index, flush the unfinished batch
                 if (batchCounter == batchSize || y == bigY.length - 1) {
                     // submitting pending changes in the batch
@@ -155,16 +161,19 @@ public class Model implements Serializable {
                 }
             }
             countCorrect(bigX, bigY);
-            printIntermediate();
+            printTrainingData();
         }
     }
 
     public void countCorrect(double[][] bigX, double[][] bigY) {
         // test the model, save the outputs
         double[][] prediction = predict(bigX);
+
+        //
         for (int p = 0; p < bigY.length; p++) {
             int actual = largest(bigY[p]);
             int predicted = largest(prediction[p]);
+
             if (actual == predicted) {
                 _correct[actual]++;
             } else {
@@ -173,7 +182,7 @@ public class Model implements Serializable {
         }
     }
 
-    public void printIntermediate() {
+    public void printTrainingData() {
         DecimalFormat numberFormat = new DecimalFormat("0.##");
 
         int correctSum = 0;

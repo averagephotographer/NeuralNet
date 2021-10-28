@@ -69,18 +69,7 @@ class Main {
         }
         /////////////////////////////////////////////////////////
 
-        // print options here
-        // 0 - exit
-        // 1 - train the network
-        /// ask to make sure you want to train
-        // 2 - load pre-trained network
-        // 3 - accuracy on TRAINING data
-        // 4 - accuracy on TESTING data
-        // 5 - save network state to file
-
-        // todo: get user input
         Scanner input = new Scanner(System.in);
-        // next token
 
         // Initialize shared variables
         int length = 0;
@@ -93,15 +82,17 @@ class Main {
         double[][] Y = new double[1][1];
 
         while (true) {
+            System.out.println();
             System.out.println("1 - Train the network");
-            System.out.println("2 - load pre-trained network");
-            System.out.println("3 - accuracy on TRAINING data");
-            System.out.println("4 - accuracy on TESTING data");
-            System.out.println("5 - save network state to file");
-            System.out.println("6 - print misclassified images");
-            System.out.println("0 - exit");
-
+            System.out.println("2 - Load pre-trained network");
+            System.out.println("3 - Accuracy on TRAINING data");
+            System.out.println("4 - Accuracy on TESTING data");
+            System.out.println("5 - Save network state to file");
+            System.out.println("6 - Print images");
+            System.out.println("0 - Exit");
+            System.out.print("Option: ");
             int option = input.nextInt();
+            System.out.println();
 
             switch (option) {
             case 0:
@@ -140,9 +131,9 @@ class Main {
                 // todo: randomize entire set
 
                 // model parameters
-                // should be 100 hidden layers, 30 epochs
+                // default to 100 nodes in the hidden layer, 30 epochs
                 int[] sizes = { 784, 100, 10 };
-                int epochs = 5;
+                int epochs = 3;
                 int BatchSize = 10;
                 int LearningRate = 3;
 
@@ -178,7 +169,7 @@ class Main {
                     }
                 }
                 model.countCorrect(X, Y);
-                model.printIntermediate();
+                model.printTrainingData();
                 break;
 
             case 4:
@@ -201,7 +192,7 @@ class Main {
                     }
                 }
                 model.countCorrect(X, Y);
-                model.printIntermediate();
+                model.printTrainingData();
                 break;
 
             case 5:
@@ -213,10 +204,20 @@ class Main {
                 break;
             case 6:
                 // ascii print data
+                int a = 1;
+                for (int i = 0; i < X.length; i++) {
+                    if (a == 1) {
+                        printNum(X[i], Y[i]);
+                        System.out.println();
+                        System.out.println("Press 1 to continue, any other key exits");
+                        a = input.nextInt();
+                    } else {
+                        break;
+                    }
+                }
                 break;
             }
         }
-
     }
 
     // https://mkyong.com/java/how-to-read-and-write-java-object-to-a-file/
@@ -286,13 +287,13 @@ class Main {
         return raw;
     }
 
-    public static void printNum(double[] number, double[] valueArr) {
+    public static void printNum(double[] smallX, double[] smallY) {
         int value = 0;
         int counter = 0;
 
         // get classification
-        for (int v = 0; v < valueArr.length; v++) {
-            if (valueArr[v] == 1.0) {
+        for (int v = 0; v < smallY.length; v++) {
+            if (smallY[v] == 1.0) {
                 value = v;
                 System.out.println("value: " + value);
             }
@@ -301,7 +302,7 @@ class Main {
         // print ascii
         System.out.println("number: " + value);
         for (int i = 1; i < 784; i++) {
-            System.out.print(" " + ascii(number[i]));
+            System.out.print(" " + ascii(smallX[i]));
             counter++;
             if (counter > 27) {
                 System.out.println();

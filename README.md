@@ -46,6 +46,7 @@ java Main
 ## 5 - Save network state
 * saves the model to `<filename>.model`
 
-## 6 - Print misclassified images
-* ^this is the goal
-* currently prints all the images
+## 6 - Print images
+* must have trained or tested a model
+* prints all the images
+* goal is to get it to print the misclassified images

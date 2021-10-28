@@ -40,15 +40,7 @@ public class Layer implements Serializable {
         return _hidden;
     }
 
-    public void holdWeightChanges(double[][] changes) {
-        _weightChanges = Net.addArrays(_weightChanges, changes);
-    }
-
-    public void holdBiasChanges(double[] changes) {
-        _biasChanges = Net.addArrays(_biasChanges, changes);
-    }
-
-    // gets the next weights ready for the
+    // preps the weights for the next batch
     public void flush(int batchSize) {
         // average the weights and biases over the batch size
         _weightChanges = Net.multiplyScalar(_weightChanges, 1 / Double.valueOf(batchSize));
