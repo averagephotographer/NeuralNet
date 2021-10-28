@@ -4,6 +4,12 @@ Christopher Tullier
 102-58-973
 Assignment 2 - MNIST
 RNN that learns how to recognize handwritten digits from the MNIST databse
+
+
+***********************************************
+**** SEE README FOR INSTRUCTIONS ****
+***********************************************
+
 */
 import java.io.*;
 import java.util.Scanner;
