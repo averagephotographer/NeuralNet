@@ -119,12 +119,16 @@ public class Model implements Serializable {
                     } else {
                         // error for l-1 layers
                         // won't reach here until after the right-most layer has been calculated
+                        // each node has error terms
                         for (int k = 0; k < errorTerms.length; k++) {
-                            double sum = 0;
+                            double rightSum = 0;
+
                             for (int j = 0; j < errorRightLayer.length; j++) {
-                                sum += _layers[currLayerIndex + 1]._weights[j][k] * errorRightLayer[j];
+                                rightSum += _layers[currLayerIndex + 1]._weights[j][k] * errorRightLayer[j];
                             }
-                            errorTerms[k] = sum * _layers[currLayerIndex]._hidden[k]
+                            // error terms for this layer's nodes
+                            // rightSum * current hidden layer * (1- hidden)
+                            errorTerms[k] = rightSum * _layers[currLayerIndex]._hidden[k]
                                     * (1 - _layers[currLayerIndex]._hidden[k]);
                         }
                     }
