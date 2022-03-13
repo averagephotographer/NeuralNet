@@ -1,5 +1,8 @@
 # source: https://colab.research.google.com/github/tensorflow/docs/blob/master/site/en/tutorials/quickstart/beginner.ipynb#scrollTo=SfR4MsSDU880
 
+# what does it think a 9 looks like
+
+
 import matplotlib.pyplot as plt
 import numpy
 import tensorflow as tf
@@ -8,12 +11,15 @@ import tensorflow.keras as keras
 mnist = tf.keras.datasets.mnist
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
 x_train, x_test = x_train / 255.0, x_test / 255.0
+
 def create_model():
     model = tf.keras.models.Sequential([
+        # each of these is a layer
         tf.keras.layers.Flatten(input_shape=(28,28)), # input layer
         tf.keras.layers.Dense(128, activation='relu'), # layer 2
         # tf.keras.layers.Dense(64, activation='sigmoid'), # layer 3
-        # tf.keras.layers.Dropout(0.2), # randomly sets to 0, prevents overfitting
+        
+        tf.keras.layers.Dropout(0.2), # randomly sets to 0, prevents overfitting with relu 
         tf.keras.layers.Dense(10) # output layer
     ])
 
@@ -29,17 +35,6 @@ def create_model():
     return model
 
 model = create_model()
-# for each example, model returns a vector of logits (log-odds scores)
-# one for each class
-# predictions = model(x_train[:1]).numpy()
-# predictions
-
-# converts logits to probabilities for each class
-# tf.nn.softmax(predictions).numpy()
-
-
-# loss_fn(y_train[:1], predictions).numpy()
-
 
 
 def ascii(value):
